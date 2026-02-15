@@ -1,42 +1,354 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto Click Page - Unlimited</title>
-
-  <!-- RevenueCPMGate Script -->
-  <script type="text/javascript" src="//pl27589641.revenuecpmgate.com/5d/72/07/5d72074614de6af7d757a4d733ca27fa.js"></script>
-
-  <script type="text/javascript">
-    // 3 තත්පරකට 1 වර URL එක ස්වයංක්‍රීයව විවෘත කිරීම
-    window.onload = function() {
-      setInterval(function() {
-        window.open(
-          "https://www.revenuecpmgate.com/njbgthpr5t?key=d9b4fd9eff0ae84cbb24cc7981b3e1a4",
-          "_blank"
-        );
-      }, 3000); // 3000ms = 3 තත්පර
-    };
-  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KC Money Management - Carry Forward</title>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.8/dist/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      max-width: 940px;
+      margin: 0 auto;
     }
     h1 {
+      text-align: center;
+      color: #4a148c;
+      margin-bottom: 0.8em;
+    }
+    select, button {
+      padding: 10px 16px;
+      font-size: 1.05rem;
+      margin: 8px 12px 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: linear-gradient(90deg, #7b1fa2, #4a148c);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(123,31,162,0.4);
+      transition: all 0.2s;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(123,31,162,0.5);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #e1bee7;
+      color: #4a148c;
+    }
+    tr:hover {
+      background: #f9f5fd;
+    }
+    .income       { color: #2e7d32; font-weight: bold; }
+    .expenses, .in-shop\ expenses { color: #c62828; font-weight: bold; }
+    .missing      { color: #f57c00; font-weight: bold; }
+    .rdb\ deposit, .boc\ deposit { color: #1565c0; font-weight: bold; }
+    .investment   { color: #8e24aa; font-weight: bold; }
+
+    .monthly-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 18px rgba(0,0,0,0.1);
+      margin: 24px auto;
+      max-width: 560px;
+      overflow: hidden;
+    }
+    .monthly-header {
+      background: linear-gradient(90deg, #4a148c, #7b1fa2);
+      color: white;
+      padding: 16px;
+      font-size: 1.35rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .monthly-body {
+      padding: 20px;
+      line-height: 1.7;
       color: #333;
+    }
+    .monthly-body div {
+      margin: 8px 0;
+    }
+    .final-cash {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #d81b60;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 2px dashed #eee;
+    }
+
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: #4a148c;
+      z-index: 9999;
+    }
+    #loader::after {
+      content: "";
+      width: 56px;
+      height: 56px;
+      border: 6px solid #7b1fa2;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #formModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    #formModal > div {
+      background: white;
+      border-radius: 12px;
+      width: 92%;
+      max-width: 640px;
+      height: 88vh;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+    }
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      font-size: 36px;
+      color: #c62828;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>ඔටෝ පිටුව විවෘත වේ 3 තත්පරකට 1 වර</h1>
-  <p>ඔබට මෙම පිටුව ඇඟවීමෙන් පසුව සක්‍රීයව නව ටැබ් විවෘත වේ.</p>
+
+<div id="loader">Loading transactions…</div>
+
+<h1>KC Money Management</h1>
+
+<label for="day">Select Date:</label>
+<select id="day"></select>
+
+<button onclick="document.getElementById('formModal').style.display='flex'">
+  + Add Entry
+</button>
+
+<div id="formModal">
+  <div>
+    <span class="close-btn" onclick="document.getElementById('formModal').style.display='none'">×</span>
+    <iframe src="./form.html" style="width:100%; height:100%; border:none;"></iframe>
+  </div>
+</div>
+
+<div id="monthlyProfit" class="monthly-card" style="display:none;"></div>
+
+<table id="reportTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Type</th>
+      <th>Amount (Rs.)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="dayBalance" style="text-align:center; font-size:1.15rem; margin:20px 0; color:#555; display:none;"></div>
+
+<script>
+const data = [];
+
+fetch("https://opensheet.elk.sh/1liis-IfyE7n9yeJV5osfqaRz0MMTz0UY9ijv3x5vEk8/ABC")
+  .then(r => {
+    if (!r.ok) throw new Error("Sheet fetch failed: " + r.status);
+    return r.json();
+  })
+  .then(rows => {
+    rows.forEach(row => {
+      const date  = (row.Date || row.date || '').trim();
+      const desc  = (row.Description || row.description || '').trim();
+      const type  = (row.Type || row.type || '').trim();
+      const amount = Number(row['Amount (Rs.)'] || row.amount || 0);
+
+      if (date && !isNaN(amount)) {
+        data.push({ date, description: desc, type, amount });
+      }
+    });
+
+    // Sort chronologically (oldest → newest)
+    data.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    document.getElementById('loader').style.display = 'none';
+    initialize();
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById('loader').innerHTML = 'Failed to load data<br><small>Check internet / sheet access</small>';
+  });
+
+function initialize() {
+  const select = document.getElementById('day');
+  const tbody  = document.querySelector('#reportTable tbody');
+
+  // Populate dropdown (newest first)
+  const dates = [...new Set(data.map(r => r.date))].sort((a,b) => new Date(b) - new Date(a));
+  dates.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    select.appendChild(opt);
+  });
+
+  if (dates.length > 0) {
+    select.value = dates[0]; // newest date
+  }
+
+  select.addEventListener('change', updateView);
+  updateView();
+
+  function updateView() {
+    const selectedDate = select.value;
+    if (!selectedDate) return;
+
+    // ── 1. Daily table ───────────────────────────────────────
+    tbody.innerHTML = '';
+    const dayItems = data.filter(r => r.date === selectedDate);
+
+    let dayNet = 0;
+    dayItems.forEach(item => {
+      const tr = document.createElement('tr');
+      const cls = item.type.toLowerCase().replace(/\s+/g, '-'); // better class safety
+      tr.innerHTML = `
+        <td>${item.description || '—'}</td>
+        <td class="${cls}">${item.type}</td>
+        <td class="${cls}">${item.amount.toFixed(2)}</td>
+      `;
+      tbody.appendChild(tr);
+
+      if (item.type === 'Income') {
+        dayNet += item.amount;
+      } else if (['Expenses','In-shop Expenses','Missing','BOC Deposit','Investment'].includes(item.type)) {
+        dayNet -= item.amount;
+      }
+    });
+
+    document.getElementById('dayBalance').textContent = 
+      `${selectedDate} දවසේ අවසාන ලාභය: Rs. ${dayNet.toFixed(2)}`;
+    document.getElementById('dayBalance').style.display = dayItems.length ? 'block' : 'none';
+    document.getElementById('reportTable').style.display = 'table';
+
+    // ── 2. Monthly summary with carry-forward ─────────────────
+    const selectedD = new Date(selectedDate);
+    const upToNow = data.filter(r => new Date(r.date) <= selectedD);
+
+    if (upToNow.length === 0) {
+      document.getElementById('monthlyProfit').innerHTML = '<div style="text-align:center;padding:30px;color:#777;">No transactions yet</div>';
+      document.getElementById('monthlyProfit').style.display = 'block';
+      return;
+    }
+
+    // Group by YYYY-MM
+    const months = {};
+    upToNow.forEach(r => {
+      const d = new Date(r.date);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      if (!months[key]) months[key] = [];
+      months[key].push(r);
+    });
+
+    const sortedKeys = Object.keys(months).sort();
+
+    let carry = 0;
+    let prevMonthKey = '';
+
+    for (let i = 0; i < sortedKeys.length - 1; i++) {
+      const key = sortedKeys[i];
+      const net = getMonthNet(months[key]);
+      carry += net;
+      prevMonthKey = key;
+    }
+
+    // Current (last) month
+    const currentKey = sortedKeys[sortedKeys.length-1];
+    const currentItems = months[currentKey];
+    const currentNet = getMonthNet(currentItems);
+
+    const finalCash = carry + currentNet;
+
+    const income   = sumByType(currentItems, 'Income');
+    const expense  = sumByType(currentItems, ['Expenses','In-shop Expenses']);
+    const missing  = sumByType(currentItems, 'Missing');
+    const deposit  = sumByType(currentItems, ['BOC Deposit','RDB Deposit']);
+    const invest   = sumByType(currentItems, 'Investment');
+
+    document.getElementById('monthlyProfit').innerHTML = `
+      <div class="monthly-header">
+        Monthly Summary up to ${selectedDate}
+      </div>
+      <div class="monthly-body">
+        ${prevMonthKey ? `<div>Carry forward (${prevMonthKey}): <strong style="color:#1976d2;">Rs. ${carry.toFixed(2)}</strong></div>` : ''}
+        <div>Income: <span class="income">Rs. ${income.toFixed(2)}</span></div>
+        <div>Expenses: <span class="expenses">Rs. ${expense.toFixed(2)}</span></div>
+        <div>Missing: <span class="missing">Rs. ${missing.toFixed(2)}</span></div>
+        <div>Investment: <span class="investment">Rs. ${invest.toFixed(2)}</span></div>
+        <div>BOC / RDB Deposit: <span class="boc deposit">Rs. ${deposit.toFixed(2)}</span></div>
+        <div class="final-cash">
+          Hand Cash: Rs. ${finalCash.toFixed(2)}
+        </div>
+      </div>`;
+
+    document.getElementById('monthlyProfit').style.display = 'block';
+  }
+}
+
+function getMonthNet(items) {
+  return sumByType(items, 'Income')
+       - sumByType(items, ['Expenses','In-shop Expenses'])
+       - sumByType(items, 'Missing')
+       - sumByType(items, ['BOC Deposit','RDB Deposit'])
+       - sumByType(items, 'Investment');
+}
+
+function sumByType(items, typeOrTypes) {
+  const types = Array.isArray(typeOrTypes) ? typeOrTypes : [typeOrTypes];
+  return items
+    .filter(r => types.includes(r.type))
+    .reduce((sum, r) => sum + r.amount, 0);
+}
+</script>
 </body>
 </html>
