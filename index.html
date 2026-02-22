@@ -6,191 +6,281 @@
   <title>KC Money Management - Carry Forward</title>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.8/dist/jspdf.plugin.autotable.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
+    :root {
+      --primary: #4a148c;
+      --primary-dark: #311b92;
+      --primary-light: #7b1fa2;
+      --accent: #d81b60;
+      --success: #2e7d32;
+      --danger: #c62828;
+      --warning: #f57c00;
+      --info: #1565c0;
+      --bg: #f8f5fd;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --shadow-sm: 0 4px 12px rgba(74,20,140,0.12);
+      --shadow: 0 10px 30px rgba(74,20,140,0.18);
+    }
+
+    * { box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e8e0f5 100%);
       margin: 0;
-      padding: 20px;
-      max-width: 940px;
+      padding: 20px 15px;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
       margin: 0 auto;
     }
+
     h1 {
       text-align: center;
-      color: #4a148c;
-      margin-bottom: 0.8em;
+      color: var(--primary);
+      margin: 0.4em 0 1.2em;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.6px;
     }
+
+    .controls {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
     select, button {
-      padding: 10px 16px;
-      font-size: 1.05rem;
-      margin: 8px 12px 8px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: linear-gradient(90deg, #7b1fa2, #4a148c);
-      color: white;
+      padding: 12px 22px;
+      font-size: 1.1rem;
+      margin: 8px;
+      border-radius: 12px;
       border: none;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.28s ease;
+    }
+
+    button {
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      color: white;
+      font-weight: 600;
       cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 3px 10px rgba(123,31,162,0.4);
-      transition: all 0.2s;
     }
+
     button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(123,31,162,0.5);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
     }
+
+    .monthly-card, #profitChartCard {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.4);
+      margin: 28px auto;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .monthly-card:hover, #profitChartCard:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(74,20,140,0.22);
+    }
+
+    .monthly-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      padding: 18px 24px;
+      font-size: 1.55rem;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 0.4px;
+    }
+
+    .monthly-body {
+      padding: 24px 28px;
+      line-height: 1.75;
+      font-size: 1.08rem;
+    }
+
+    .monthly-body div {
+      margin: 12px 0;
+    }
+
+    .final-cash {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 2px dashed rgba(216,27,96,0.35);
+    }
+
     table {
       width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+      margin: 25px 0;
       background: white;
-      border-radius: 10px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow);
     }
-    th, td {
-      padding: 12px 14px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background: #e1bee7;
-      color: #4a148c;
-    }
-    tr:hover {
-      background: #f9f5fd;
-    }
-    .income       { color: #2e7d32; font-weight: bold; }
-    .expenses, .in-shop\ expenses { color: #c62828; font-weight: bold; }
-    .missing      { color: #f57c00; font-weight: bold; }
-    .rdb\ deposit, .boc\ deposit { color: #1565c0; font-weight: bold; }
-    .investment   { color: #8e24aa; font-weight: bold; }
 
-    .monthly-card {
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+    }
+
+    th {
+      background: linear-gradient(90deg, #e1bee7, #d1c4e9);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    tr {
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 5px 18px rgba(0,0,0,0.1);
-      margin: 24px auto;
-      max-width: 560px;
-      overflow: hidden;
+      transition: background 0.2s;
     }
-    .monthly-header {
-      background: linear-gradient(90deg, #4a148c, #7b1fa2);
-      color: white;
-      padding: 16px;
-      font-size: 1.35rem;
-      font-weight: bold;
-      text-align: center;
-    }
-    .monthly-body {
-      padding: 20px;
-      line-height: 1.7;
-      color: #333;
-    }
-    .monthly-body div {
-      margin: 8px 0;
-    }
-    .final-cash {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #d81b60;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 2px dashed #eee;
+
+    tr:hover {
+      background: #f5edff;
     }
 
     #loader {
       position: fixed;
       inset: 0;
-      background: rgba(255,255,255,0.96);
+      background: rgba(248,245,253,0.97);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
-      color: #4a148c;
+      font-size: 1.9rem;
+      color: var(--primary);
       z-index: 9999;
     }
+
     #loader::after {
       content: "";
-      width: 56px;
-      height: 56px;
-      border: 6px solid #7b1fa2;
+      width: 80px;
+      height: 80px;
+      border: 8px solid var(--primary-light);
       border-top-color: transparent;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-top: 20px;
+      animation: spin 1.1s linear infinite;
+      margin-top: 30px;
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
     #formModal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.68);
       z-index: 10000;
       align-items: center;
       justify-content: center;
+      padding: 15px;
     }
+
     #formModal > div {
       background: white;
-      border-radius: 12px;
-      width: 92%;
-      max-width: 640px;
-      height: 88vh;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 720px;
+      height: 92vh;
       position: relative;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      box-shadow: 0 25px 70px rgba(0,0,0,0.45);
+      overflow: hidden;
     }
+
     .close-btn {
       position: absolute;
-      top: 12px;
-      right: 18px;
-      font-size: 36px;
-      color: #c62828;
+      top: 16px;
+      right: 22px;
+      font-size: 44px;
+      color: var(--danger);
       cursor: pointer;
       font-weight: bold;
+      z-index: 10;
+    }
+
+    #profitChartCard {
+      height: 520px;
+    }
+
+    .income { color: var(--success); font-weight: 700; }
+    .expenses, .in-shop\ expenses { color: var(--danger); font-weight: 700; }
+    .missing { color: var(--warning); font-weight: 700; }
+    .rdb\ deposit, .boc\ deposit { color: var(--info); font-weight: 700; }
+    .investment { color: #8e24aa; font-weight: 700; }
+
+    #dayBalance {
+      text-align: center;
+      font-size: 1.35rem;
+      margin: 28px 0;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 2rem; }
+      .monthly-header { font-size: 1.4rem; }
+      select, button { font-size: 1rem; padding: 10px 18px; }
+      #profitChartCard { height: 420px; }
     }
   </style>
 </head>
 <body>
 
-<div id="loader">Loading transactions…</div>
+<div id="loader">Loading your finances…</div>
 
-<h1>KC Money Management</h1>
+<div class="container">
+  <h1>KC Money Management</h1>
 
-<label for="day">Select Date:</label>
-<select id="day"></select>
-
-<button onclick="document.getElementById('formModal').style.display='flex'">
-  + Add Entry
-</button>
-
-<div id="formModal">
-  <div>
-    <span class="close-btn" onclick="document.getElementById('formModal').style.display='none'">×</span>
-    <iframe src="./form.html" style="width:100%; height:100%; border:none;"></iframe>
+  <div class="controls">
+    <label for="day" style="font-size:1.1rem; margin-right:10px; color:#555;">Select Date:</label>
+    <select id="day"></select>
+    <button onclick="document.getElementById('formModal').style.display='flex'">
+      + Add Entry
+    </button>
   </div>
+
+  <div id="formModal">
+    <div>
+      <span class="close-btn" onclick="document.getElementById('formModal').style.display='none'">×</span>
+      <iframe src="./form.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+  </div>
+
+  <div id="monthlyProfit" class="monthly-card" style="display:none;"></div>
+
+  <div id="profitChartCard" class="monthly-card" style="display:none;">
+    <div class="monthly-header">Cash Flow & Profit Trend</div>
+    <canvas id="profitChart"></canvas>
+  </div>
+
+  <table id="reportTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Amount (Rs.)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="dayBalance" style="display:none;"></div>
 </div>
-
-<div id="monthlyProfit" class="monthly-card" style="display:none;"></div>
-
-<table id="reportTable" style="display:none;">
-  <thead>
-    <tr>
-      <th>Description</th>
-      <th>Type</th>
-      <th>Amount (Rs.)</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-
-<div id="dayBalance" style="text-align:center; font-size:1.15rem; margin:20px 0; color:#555; display:none;"></div>
 
 <script>
 const data = [];
+let profitChart = null;
 
 fetch("https://opensheet.elk.sh/1liis-IfyE7n9yeJV5osfqaRz0MMTz0UY9ijv3x5vEk8/ABC")
   .then(r => {
@@ -199,32 +289,25 @@ fetch("https://opensheet.elk.sh/1liis-IfyE7n9yeJV5osfqaRz0MMTz0UY9ijv3x5vEk8/ABC
   })
   .then(rows => {
     rows.forEach(row => {
-      const date  = (row.Date || row.date || '').trim();
-      const desc  = (row.Description || row.description || '').trim();
-      const type  = (row.Type || row.type || '').trim();
+      const date = (row.Date || row.date || '').trim();
+      const desc = (row.Description || row.description || '').trim();
+      const type = (row.Type || row.type || '').trim();
       const amount = Number(row['Amount (Rs.)'] || row.amount || 0);
-
       if (date && !isNaN(amount)) {
         data.push({ date, description: desc, type, amount });
       }
     });
-
-    // Sort chronologically (oldest → newest)
     data.sort((a,b) => new Date(a.date) - new Date(b.date));
-
     document.getElementById('loader').style.display = 'none';
     initialize();
   })
   .catch(err => {
     console.error(err);
-    document.getElementById('loader').innerHTML = 'Failed to load data<br><small>Check internet / sheet access</small>';
+    document.getElementById('loader').innerHTML = 'Failed to load data<br><small>Check connection / sheet permissions</small>';
   });
 
 function initialize() {
   const select = document.getElementById('day');
-  const tbody  = document.querySelector('#reportTable tbody');
-
-  // Populate dropdown (newest first)
   const dates = [...new Set(data.map(r => r.date))].sort((a,b) => new Date(b) - new Date(a));
   dates.forEach(d => {
     const opt = document.createElement('option');
@@ -232,106 +315,218 @@ function initialize() {
     opt.textContent = d;
     select.appendChild(opt);
   });
-
-  if (dates.length > 0) {
-    select.value = dates[0]; // newest date
-  }
-
+  if (dates.length) select.value = dates[0];
   select.addEventListener('change', updateView);
   updateView();
+}
 
-  function updateView() {
-    const selectedDate = select.value;
-    if (!selectedDate) return;
+function updateView() {
+  const selectedDate = document.getElementById('day').value;
+  if (!selectedDate) return;
 
-    // ── 1. Daily table ───────────────────────────────────────
-    tbody.innerHTML = '';
-    const dayItems = data.filter(r => r.date === selectedDate);
+  // Daily table
+  const tbody = document.querySelector('#reportTable tbody');
+  tbody.innerHTML = '';
+  const dayItems = data.filter(r => r.date === selectedDate);
+  let dayNet = 0;
 
-    let dayNet = 0;
-    dayItems.forEach(item => {
-      const tr = document.createElement('tr');
-      const cls = item.type.toLowerCase().replace(/\s+/g, '-'); // better class safety
-      tr.innerHTML = `
-        <td>${item.description || '—'}</td>
-        <td class="${cls}">${item.type}</td>
-        <td class="${cls}">${item.amount.toFixed(2)}</td>
-      `;
-      tbody.appendChild(tr);
+  dayItems.forEach(item => {
+    const tr = document.createElement('tr');
+    const cls = item.type.toLowerCase().replace(/\s+/g, '-');
+    tr.innerHTML = `
+      <td>${item.description || '—'}</td>
+      <td class="${cls}">${item.type}</td>
+      <td class="${cls}">${item.amount.toFixed(2)}</td>
+    `;
+    tbody.appendChild(tr);
 
-      if (item.type === 'Income') {
-        dayNet += item.amount;
-      } else if (['Expenses','In-shop Expenses','Missing','BOC Deposit','Investment'].includes(item.type)) {
-        dayNet -= item.amount;
+    if (item.type === 'Income') dayNet += item.amount;
+    else if (['Expenses','In-shop Expenses','Missing','BOC Deposit','RDB Deposit','Investment'].includes(item.type))
+      dayNet -= item.amount;
+  });
+
+  document.getElementById('dayBalance').textContent = 
+    `${selectedDate} දවසේ අවසාන ලාභය: Rs. ${dayNet.toFixed(2)}`;
+  document.getElementById('dayBalance').style.display = dayItems.length ? 'block' : 'none';
+  document.getElementById('reportTable').style.display = dayItems.length ? 'table' : 'none';
+
+  // Data up to selected date
+  const selectedD = new Date(selectedDate);
+  const upToNow = data.filter(r => new Date(r.date) <= selectedD);
+
+  if (upToNow.length === 0) {
+    document.getElementById('monthlyProfit').innerHTML = '<div style="text-align:center;padding:40px;color:#777;font-size:1.2rem;">No transactions yet</div>';
+    document.getElementById('monthlyProfit').style.display = 'block';
+    document.getElementById('profitChartCard').style.display = 'none';
+    return;
+  }
+
+  // Monthly grouping & carry forward
+  const months = {};
+  upToNow.forEach(r => {
+    const d = new Date(r.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (!months[key]) months[key] = [];
+    months[key].push(r);
+  });
+
+  const sortedKeys = Object.keys(months).sort();
+  let carry = 0;
+  let prevMonthKey = '';
+
+  for (let i = 0; i < sortedKeys.length - 1; i++) {
+    carry += getMonthNet(months[sortedKeys[i]]);
+    prevMonthKey = sortedKeys[i];
+  }
+
+  const currentKey = sortedKeys[sortedKeys.length-1];
+  const currentItems = months[currentKey];
+  const currentNet = getMonthNet(currentItems);
+  const finalCash = carry + currentNet;
+
+  const income   = sumByType(currentItems, 'Income');
+  const expense  = sumByType(currentItems, ['Expenses','In-shop Expenses']);
+  const missing  = sumByType(currentItems, 'Missing');
+  const deposit  = sumByType(currentItems, ['BOC Deposit','RDB Deposit']);
+  const invest   = sumByType(currentItems, 'Investment');
+
+  document.getElementById('monthlyProfit').innerHTML = `
+    <div class="monthly-header">Monthly Summary up to ${selectedDate}</div>
+    <div class="monthly-body">
+      ${prevMonthKey ? `<div>Carry forward (${prevMonthKey}): <strong style="color:#1976d2;">Rs. ${carry.toFixed(2)}</strong></div>` : ''}
+      <div>Income: <span class="income">Rs. ${income.toFixed(2)}</span></div>
+      <div>Expenses: <span class="expenses">Rs. ${expense.toFixed(2)}</span></div>
+      <div>Missing: <span class="missing">Rs. ${missing.toFixed(2)}</span></div>
+      <div>Investment: <span class="investment">Rs. ${invest.toFixed(2)}</span></div>
+      <div>BOC / RDB Deposit: <span class="boc deposit">Rs. ${deposit.toFixed(2)}</span></div>
+      <div class="final-cash">Hand Cash: Rs. ${finalCash.toFixed(2)}</div>
+    </div>`;
+  document.getElementById('monthlyProfit').style.display = 'block';
+
+  // ── Chart ────────────────────────────────────────────────────────────────
+  const chartContainer = document.getElementById('profitChartCard');
+  const canvas = document.getElementById('profitChart');
+
+  const dailyNets = {};
+  upToNow.forEach(r => {
+    if (!dailyNets[r.date]) dailyNets[r.date] = 0;
+    if (r.type === 'Income') dailyNets[r.date] += r.amount;
+    else if (['Expenses','In-shop Expenses','Missing','BOC Deposit','RDB Deposit','Investment'].includes(r.type))
+      dailyNets[r.date] -= r.amount;
+  });
+
+  const sortedDates = Object.keys(dailyNets).sort((a,b) => new Date(a) - new Date(b));
+  const dailyProfits = [];
+  const cumulative = [];
+  let running = 0;
+
+  sortedDates.forEach(date => {
+    const net = dailyNets[date];
+    dailyProfits.push(net);
+    running += net;
+    cumulative.push(running);
+  });
+
+  chartContainer.style.display = 'block';
+
+  if (profitChart) {
+    profitChart.data.labels = sortedDates;
+    profitChart.data.datasets[0].data = cumulative;
+    profitChart.data.datasets[1].data = dailyProfits;
+    profitChart.update();
+  } else {
+    const ctx = canvas.getContext('2d');
+    profitChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: sortedDates,
+        datasets: [
+          {
+            label: 'Cumulative Hand Cash (Rs.)',
+            data: cumulative,
+            borderColor: 'rgba(74,20,140,0.9)',
+            backgroundColor: 'rgba(74,20,140,0.14)',
+            fill: true,
+            tension: 0.38,
+            pointBackgroundColor: '#7b1fa2',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 10,
+            pointRadius: 5,
+            borderWidth: 3.5,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Daily Net Profit / Loss (Rs.)',
+            data: dailyProfits,
+            borderColor: 'rgba(216,27,96,0.85)',
+            backgroundColor: 'rgba(216,27,96,0.1)',
+            fill: false,
+            tension: 0.22,
+            pointBackgroundColor: '#d81b60',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 11,
+            pointRadius: 6,
+            borderWidth: 2.5,
+            borderDash: [6,4],
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 1400, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { position: 'top', labels: { font: { size: 15, weight: '600' } } },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(30,30,50,0.92)',
+            titleFont: { size: 14 },
+            bodyFont: { size: 13 },
+            callbacks: {
+              label: ctx => {
+                let label = ctx.dataset.label || '';
+                if (label) label += ': ';
+                const v = ctx.parsed.y;
+                const sign = v > 0 ? '+' : v < 0 ? '-' : '';
+                return label + sign + 'Rs. ' + Math.abs(v).toLocaleString('si-LK', {minimumFractionDigits:2});
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Date', font: { size: 14 } },
+            ticks: { maxRotation: 50, minRotation: 50, font: { size: 12 } }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            title: { display: true, text: 'Cumulative (Rs.)', font: { size: 14 } },
+            ticks: { callback: v => 'Rs. ' + v.toLocaleString('si-LK') }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            title: { display: true, text: 'Daily P/L (Rs.)', font: { size: 14 } },
+            grid: { drawOnChartArea: false },
+            ticks: {
+              callback: v => {
+                if (v > 0) return '+Rs. ' + v.toLocaleString('si-LK');
+                if (v < 0) return '-Rs. ' + Math.abs(v).toLocaleString('si-LK');
+                return 'Rs. 0';
+              },
+              color: ctx => {
+                const val = ctx.tick.value;
+                return val > 0 ? '#2e7d32' : val < 0 ? '#c62828' : '#555';
+              }
+            }
+          }
+        },
+        interaction: { mode: 'nearest', axis: 'x', intersect: false }
       }
     });
-
-    document.getElementById('dayBalance').textContent = 
-      `${selectedDate} දවසේ අවසාන ලාභය: Rs. ${dayNet.toFixed(2)}`;
-    document.getElementById('dayBalance').style.display = dayItems.length ? 'block' : 'none';
-    document.getElementById('reportTable').style.display = 'table';
-
-    // ── 2. Monthly summary with carry-forward ─────────────────
-    const selectedD = new Date(selectedDate);
-    const upToNow = data.filter(r => new Date(r.date) <= selectedD);
-
-    if (upToNow.length === 0) {
-      document.getElementById('monthlyProfit').innerHTML = '<div style="text-align:center;padding:30px;color:#777;">No transactions yet</div>';
-      document.getElementById('monthlyProfit').style.display = 'block';
-      return;
-    }
-
-    // Group by YYYY-MM
-    const months = {};
-    upToNow.forEach(r => {
-      const d = new Date(r.date);
-      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      if (!months[key]) months[key] = [];
-      months[key].push(r);
-    });
-
-    const sortedKeys = Object.keys(months).sort();
-
-    let carry = 0;
-    let prevMonthKey = '';
-
-    for (let i = 0; i < sortedKeys.length - 1; i++) {
-      const key = sortedKeys[i];
-      const net = getMonthNet(months[key]);
-      carry += net;
-      prevMonthKey = key;
-    }
-
-    // Current (last) month
-    const currentKey = sortedKeys[sortedKeys.length-1];
-    const currentItems = months[currentKey];
-    const currentNet = getMonthNet(currentItems);
-
-    const finalCash = carry + currentNet;
-
-    const income   = sumByType(currentItems, 'Income');
-    const expense  = sumByType(currentItems, ['Expenses','In-shop Expenses']);
-    const missing  = sumByType(currentItems, 'Missing');
-    const deposit  = sumByType(currentItems, ['BOC Deposit','RDB Deposit']);
-    const invest   = sumByType(currentItems, 'Investment');
-
-    document.getElementById('monthlyProfit').innerHTML = `
-      <div class="monthly-header">
-        Monthly Summary up to ${selectedDate}
-      </div>
-      <div class="monthly-body">
-        ${prevMonthKey ? `<div>Carry forward (${prevMonthKey}): <strong style="color:#1976d2;">Rs. ${carry.toFixed(2)}</strong></div>` : ''}
-        <div>Income: <span class="income">Rs. ${income.toFixed(2)}</span></div>
-        <div>Expenses: <span class="expenses">Rs. ${expense.toFixed(2)}</span></div>
-        <div>Missing: <span class="missing">Rs. ${missing.toFixed(2)}</span></div>
-        <div>Investment: <span class="investment">Rs. ${invest.toFixed(2)}</span></div>
-        <div>BOC / RDB Deposit: <span class="boc deposit">Rs. ${deposit.toFixed(2)}</span></div>
-        <div class="final-cash">
-          Hand Cash: Rs. ${finalCash.toFixed(2)}
-        </div>
-      </div>`;
-
-    document.getElementById('monthlyProfit').style.display = 'block';
   }
 }
 
@@ -343,11 +538,9 @@ function getMonthNet(items) {
        - sumByType(items, 'Investment');
 }
 
-function sumByType(items, typeOrTypes) {
-  const types = Array.isArray(typeOrTypes) ? typeOrTypes : [typeOrTypes];
-  return items
-    .filter(r => types.includes(r.type))
-    .reduce((sum, r) => sum + r.amount, 0);
+function sumByType(items, types) {
+  const arr = Array.isArray(types) ? types : [types];
+  return items.filter(r => arr.includes(r.type)).reduce((s, r) => s + r.amount, 0);
 }
 </script>
 </body>
