@@ -24,8 +24,8 @@
     .card-header { background:linear-gradient(135deg,#1e1438,#2a1f45); color:var(--primary); padding:14px; text-align:center; font-weight:600; }
     .card-body { padding:20px; }
     .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
-    .summary-item { 
-      background:rgba(40,30,60,.6); border-radius:10px; padding:14px; text-align:center; 
+    .summary-item {
+      background:rgba(40,30,60,.6); border-radius:10px; padding:14px; text-align:center;
       cursor:pointer; transition:.2s; border:1px solid #a78bfa20;
     }
     .summary-item:hover { background:rgba(50,40,70,.9); transform:scale(1.03); box-shadow:0 6px 16px #0008; }
@@ -46,17 +46,13 @@
   </style>
 </head>
 <body>
-
 <div id="loader">Loading…</div>
-
 <div class="container">
   <header><h1>KC Money Management</h1></header>
-
   <div class="controls">
     <select id="day"></select>
-    <button onclick="document.getElementById('formModal')&&(document.getElementById('formModal').style.display='flex')">+ Add</button>
+    <button onclick="openFormPopup()">+ Add</button>
   </div>
-
   <div id="monthlyProfit" class="card" style="display:none">
     <div class="card-header">Summary</div>
     <div class="card-body">
@@ -64,17 +60,14 @@
       <div class="final-cash" id="finalCash"></div>
     </div>
   </div>
-
   <div id="chartCard" class="card" style="display:none">
     <div class="card-header">Trend</div>
     <canvas id="profitChart"></canvas>
   </div>
-
   <table id="dailyTable" class="card" style="display:none">
     <thead><tr><th>Desc</th><th>Type</th><th>Amt</th></tr></thead>
     <tbody></tbody>
   </table>
-
   <div id="dayBalance" style="display:none; text-align:center; font-size:1.35rem; margin:24px 0;"></div>
 </div>
 
@@ -112,6 +105,10 @@ fetch("https://opensheet.elk.sh/1liis-IfyE7n9yeJV5osfqaRz0MMTz0UY9ijv3x5vEk8/ABC
     data.sort((a,b) => new Date(a.date) - new Date(b.date));
     document.getElementById("loader").style.display = "none";
     init();
+  })
+  .catch(err => {
+    console.error("Failed to load data:", err);
+    document.getElementById("loader").innerHTML = "Error loading data";
   });
 
 function init() {
@@ -132,13 +129,11 @@ function updateView() {
   tb.innerHTML = "";
   const day = data.filter(r => r.date === date);
   let net = 0;
-
   day.forEach(i => {
     const cls = i.type.toLowerCase().replace(/\s+/g, "-");
     tb.innerHTML += `<tr><td>${i.desc || "—"}</td><td class="${cls}">${i.type}</td><td class="${cls}">${i.amount.toFixed(2)}</td></tr>`;
-    net += i.type === "Income" ? i.amount : (["Expenses", "In-shop Expenses", "Missing", "BOC Deposit", "Investment"].includes(i.type) ? -i.amount : 0);
+    net += i.type === "Income" ? i.amount : (["Expenses", "In-shop Expenses", "Missing", "BOC Deposit", "Investment", "RDB Deposit"].includes(i.type) ? -i.amount : 0);
   });
-
   const b = document.getElementById("dayBalance");
   b.textContent = `${date} අවසාන ලාභය: Rs. ${net.toFixed(2)}`;
   b.style.display = day.length ? "block" : "none";
@@ -146,6 +141,7 @@ function updateView() {
 
   const up = new Date(date);
   const past = data.filter(r => new Date(r.date) <= up);
+
   if (!past.length) {
     document.getElementById("monthlyProfit").innerHTML = '<div style="padding:50px;text-align:center;color:#aaa">No data</div>';
     document.getElementById("monthlyProfit").style.display = "block";
@@ -159,11 +155,9 @@ function updateView() {
     o[k] = (o[k] || []).concat(r);
     return o;
   }, {});
-
   const ks = Object.keys(m).sort();
   let carry = 0, prev = "";
   ks.slice(0, -1).forEach(k => { carry += monthNet(m[k]); prev = k; });
-
   const cur = m[ks.at(-1)];
   const hand = carry + monthNet(cur);
 
@@ -183,15 +177,14 @@ function updateView() {
       <div>BOC/RDB</div><strong class="boc deposit">Rs.${byType(cur,['BOC Deposit','RDB Deposit']).toFixed(2)}</strong></div>
   `;
 
-  // Add click listeners after rendering
   document.querySelectorAll('.summary-item').forEach(item => {
     item.onclick = () => {
       const cat = item.dataset.category;
       let filtered = [];
       if (cat === "carry") {
         const prevMonthEnd = new Date(prev + "-01");
-        prevMonthEnd.setMonth(prevMonthEnd.getMonth());
-        prevMonthEnd.setDate(0); // last day of prev month
+        prevMonthEnd.setMonth(prevMonthEnd.getMonth() + 1);
+        prevMonthEnd.setDate(0);
         filtered = past.filter(r => new Date(r.date) <= prevMonthEnd);
       } else if (cat === "Expenses") {
         filtered = past.filter(r => r.type === 'Expenses' || r.type === 'In-shop Expenses');
@@ -207,12 +200,11 @@ function updateView() {
   document.getElementById("finalCash").textContent = `Hand Cash: Rs.${hand.toFixed(2)}`;
   document.getElementById("monthlyProfit").style.display = "block";
 
-  // Chart part (unchanged, shortened)
+  // Chart
   const dn = past.reduce((o,r) => {
     o[r.date] = (o[r.date] || 0) + (r.type==="Income" ? r.amount : (["Expenses","In-shop Expenses","Missing","BOC Deposit","RDB Deposit","Investment"].includes(r.type) ? -r.amount : 0));
     return o;
   }, {});
-
   const ds = Object.keys(dn).sort();
   const vs = ds.map(k=>dn[k]);
   let tot = 0;
@@ -258,7 +250,7 @@ function showCat(title, items) {
 
 function byType(items, types) {
   const t = [].concat(types);
-  return items.filter(r => t.includes(r.type)).reduce((s, r) => s + r.amount, 0);
+  return items.filter(r => t.includes(r.type)).reduce((s, r) => s + (r.amount || 0), 0);
 }
 
 function monthNet(items) {
@@ -267,6 +259,26 @@ function monthNet(items) {
          byType(items, "Missing") -
          byType(items, ["BOC Deposit", "RDB Deposit"]) -
          byType(items, "Investment");
+}
+
+// ────────────────────────────────────────────────
+//     Popup window for ./form.html
+// ────────────────────────────────────────────────
+function openFormPopup() {
+  const width  = 540;
+  const height = 680;
+  const left   = (screen.width / 2)  - (width / 2);
+  const top    = (screen.height / 2) - (height / 2);
+
+  const popup = window.open(
+    './form.html',
+    'addTransaction',
+    `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,toolbar=no,menubar=no`
+  );
+
+  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    alert("Popup එක block වුණා වගේ පේනවා.\nBrowser එකේ popup allow කරලා ආයෙ උත්සාහ කරන්න.");
+  }
 }
 </script>
 </body>
