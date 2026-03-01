@@ -1,126 +1,256 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="si">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KC Money Management</title>
+  <title>KC Money Management - Enhanced</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg:#0f0817; --card:#1a132b; --table:#1e1930; --hover:#2a2440;
-      --text:#f0eaff; --muted:#b0a0d0; --border:#2a1f45;
-      --primary:#a78bfa; --accent:#f472b6; --success:#86efac;
-      --danger:#fca5a5; --warning:#fdba74; --info:#7dd3fc;
+      --bg: #0a0512;
+      --card: #150f24;
+      --table: #1c1630;
+      --hover: #2a2440;
+      --text: #f0eaff;
+      --muted: #b0a0d0;
+      --border: #3a2f55;
+      --primary: #a78bfa;
+      --primary-dark: #7c3aed;
+      --accent: #f472b6;
+      --success: #34d399;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --info: #60a5fa;
+      --glass: rgba(30, 20, 60, 0.4);
+      --glass-border: rgba(167, 139, 250, 0.18);
     }
-    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-    .container { max-width:1180px; margin:auto; padding:0 16px; }
-    header { text-align:center; padding:28px 0 16px; }
-    h1 { font-size:2.4rem; font-weight:700; color:var(--primary); margin-bottom:8px; }
-    .controls { display:flex; flex-wrap:wrap; gap:16px; justify-content:center; margin:20px 0; }
-    select, button { padding:10px 18px; font-size:1rem; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; }
-    button { background:linear-gradient(135deg,var(--primary),var(--accent)); border:none; font-weight:600; }
-    button:hover { transform:translateY(-1px); }
-    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; box-shadow:0 10px 25px #0006; margin:24px 0; overflow:hidden; }
-    .card-header { background:linear-gradient(135deg,#1e1438,#2a1f45); color:var(--primary); padding:14px; text-align:center; font-weight:600; }
-    .card-body { padding:20px; }
-    .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
-    .summary-item {
-      background:rgba(40,30,60,.6); border-radius:10px; padding:14px; text-align:center;
-      cursor:pointer; transition:.2s; border:1px solid #a78bfa20;
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #120b1f);
+      color: var(--text);
+      min-height: 100vh;
     }
-    .summary-item:hover { background:rgba(50,40,70,.9); transform:scale(1.03); box-shadow:0 6px 16px #0008; }
-    .summary-item strong { display:block; font-size:1.35rem; margin:6px 0; }
-    .final-cash { font-size:1.8rem; font-weight:700; color:var(--accent); text-align:center; margin-top:20px; padding-top:16px; border-top:1px dashed #f472b650; }
-    table { width:100%; border-collapse:separate; border-spacing:0 6px; margin-top:8px; }
-    th,td { padding:12px 14px; }
-    th { background:rgba(40,30,60,.8); color:var(--primary); }
-    tr { background:var(--table); }
-    tr:hover { background:var(--hover); }
-    #chartCard { height:460px; width:100%;}
-    #loader { position:fixed; inset:0; background:#0a0512; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:2rem; color:var(--primary); z-index:9999; }
-    #loader::after { content:""; width:70px; height:70px; border:8px solid var(--primary); border-top-color:transparent; border-radius:50%; animation:spin 1s linear infinite; margin-top:20px; }
-    @keyframes spin { to{transform:rotate(360deg);} }
-    #detailModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:10000; align-items:center; justify-content:center; }
-    #detailContent { background:var(--card); border-radius:12px; width:90%; max-width:760px; max-height:85vh; overflow-y:auto; padding:20px; position:relative; box-shadow:0 15px 50px #000c; }
-    .close-detail { position:absolute; top:10px; right:18px; font-size:40px; color:#fca5a5; cursor:pointer; }
-
-   @keyframes spin { to { transform: rotate(360deg); } }
-    #formModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 10000;
-      align-items: center;
+    .container { max-width: 1200px; margin: auto; padding: 0 16px; }
+    header { text-align: center; padding: 32px 0 16px; }
+    h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin: 0;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
       justify-content: center;
+      margin: 24px 0;
     }
-    #formModal > div {
-      background: white;
+    select, button, input {
+      padding: 12px 20px;
+      font-size: 1rem;
       border-radius: 12px;
-      width: 92%;
-      max-width: 640px;
-      height: 88vh;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    select:focus, input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(167,139,250,0.2); }
+    button {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(167,139,250,0.3); }
+    .card {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      margin: 28px 0;
+      overflow: hidden;
+    }
+    .card-header {
+      background: linear-gradient(135deg, #1e1438, #2a1f45);
+      padding: 16px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 20px;
+    }
+    .summary-item {
+      background: rgba(50,40,80,0.5);
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      border: 1px solid rgba(167,139,250,0.15);
+    }
+    .summary-item:hover {
+      transform: translateY(-6px) scale(1.04);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+      background: rgba(60,50,90,0.7);
+    }
+    .summary-item strong { display: block; font-size: 1.6rem; margin: 8px 0; }
+    .final-cash {
+      font-size: 2.1rem;
+      font-weight: 800;
+      text-align: center;
+      margin: 24px 0;
+      padding: 20px;
+      background: rgba(20,30,50,0.4);
+      border-radius: 12px;
+      border: 1px dashed var(--accent);
+    }
+    .profit-positive { color: var(--success); }
+    .profit-negative { color: var(--danger); }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-top: 12px;
+    }
+    th, td { padding: 14px 16px; text-align: left; }
+    th { background: rgba(50,40,80,0.7); color: var(--primary); font-weight: 600; }
+    tr { background: var(--table); transition: 0.2s; }
+    tr:hover { background: var(--hover); transform: scale(1.01); }
+
+    .type-income { color: var(--success); font-weight: 600; }
+    .type-expense, .type-in-shop-expenses, .type-missing { color: var(--danger); }
+    .type-investment, .type-boc-deposit, .type-rdb-deposit { color: var(--warning); }
+
+    #searchInput { width: 320px; max-width: 100%; }
+    #exportBtn { background: linear-gradient(135deg, #10b981, #34d399); }
+
+    #chartContainer { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 20px; }
+    #chartContainer > div { height: 420px; }
+    @media (max-width: 900px) { #chartContainer { grid-template-columns: 1fr; } }
+
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 2.5rem; color: var(--primary);
+      z-index: 9999;
+    }
+    .spinner {
+      width: 80px; height: 80px;
+      border: 10px solid var(--primary);
+      border-top: 10px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #detailModal, #formModal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 10000;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    #detailContent, #formModal > div {
+      background: var(--card);
+      border-radius: 16px;
+      width: 92%; max-width: 820px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 24px;
       position: relative;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
     }
     .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 18px;
-      font-size: 36px;
-      color: #c62828;
-      cursor: pointer;
-      font-weight: bold;
+      position: absolute; top: 12px; right: 20px;
+      font-size: 42px; color: var(--danger);
+      cursor: pointer; font-weight: bold;
     }
- 
   </style>
 </head>
 <body>
-<div id="loader">Loading…</div>
+<div id="loader">KC Money Management<br><div class="spinner"></div></div>
+
 <div class="container">
   <header><h1>KC Money Management</h1></header>
+
   <div class="controls">
     <select id="day"></select>
-<button onclick="document.getElementById('formModal').style.display='flex'">
-  + Add Entry
-</button>
-<div id="formModal">
-  <div>
-    <span class="close-btn" onclick="document.getElementById('formModal').style.display='none'">×</span>
-    <iframe src="./form.html" style="width:100%; height:100%; border:none;"></iframe>
+    <input type="text" id="searchInput" placeholder="Search description..." />
+    <button onclick="document.getElementById('formModal').style.display='flex'">+ Add Entry</button>
+    <button id="exportBtn">Export CSV</button>
   </div>
+
+  <div id="formModal">
+    <div>
+      <span class="close-btn" onclick="document.getElementById('formModal').style.display='none'">×</span>
+      <iframe src="./form.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
   </div>
+
   <div id="monthlyProfit" class="card" style="display:none">
-    <div class="card-header">Summary</div>
+    <div class="card-header">Monthly Summary</div>
     <div class="card-body">
       <div class="summary-grid" id="summaryGrid"></div>
       <div class="final-cash" id="finalCash"></div>
     </div>
   </div>
-  <div id="chartCard" class="card" style="display:none">
-    <div class="card-header">Trend</div>
-    <canvas id="profitChart"></canvas>
+
+  <div id="chartsSection" class="card" style="display:none">
+    <div class="card-header">Trends & Breakdown</div>
+    <div id="chartContainer">
+      <div><canvas id="profitChart"></canvas></div>
+      <div><canvas id="pieChart"></canvas></div>
+    </div>
   </div>
-  <table id="dailyTable" class="card" style="display:none">
-    <thead><tr><th>Desc</th><th>Type</th><th>Amt</th></tr></thead>
-    <tbody></tbody>
-  </table>
-  <div id="dayBalance" style="display:none; text-align:center; font-size:1.35rem; margin:24px 0;"></div>
+
+  <div class="card" id="dailySection" style="display:none">
+    <div class="card-header">Daily Entries</div>
+    <div class="card-body">
+      <table id="dailyTable">
+        <thead><tr><th>Date</th><th>Desc</th><th>Type</th><th>Amt (Rs.)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="dayBalance" style="display:none; text-align:center; font-size:1.6rem; margin:32px 0; font-weight:700;"></div>
 </div>
+
 <!-- Detail Modal -->
 <div id="detailModal">
   <div id="detailContent">
-    <span class="close-detail" onclick="document.getElementById('detailModal').style.display='none'">×</span>
-    <h2 id="detailTitle" style="margin:0 0 16px; color:var(--primary);"></h2>
+    <span class="close-btn" onclick="document.getElementById('detailModal').style.display='none'">×</span>
+    <h2 id="detailTitle" style="margin:0 0 20px; color:var(--primary);"></h2>
     <table id="detailTable">
       <thead><tr><th>Date</th><th>Desc</th><th>Amt</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 </div>
+
 <script>
+// ────────────────────────────────────────────────
 const data = [];
-let chart = null;
+let profitChart = null, pieChart = null;
+
 fetch("https://opensheet.elk.sh/1liis-IfyE7n9yeJV5osfqaRz0MMTz0UY9ijv3x5vEk8/ABC")
   .then(r => r.json())
   .then(rows => {
@@ -140,140 +270,262 @@ fetch("https://opensheet.elk.sh/1liis-IfyE7n9yeJV5osfqaRz0MMTz0UY9ijv3x5vEk8/ABC
     document.getElementById("loader").style.display = "none";
     init();
   });
+
+// ────────────────────────────────────────────────
 function init() {
   const s = document.getElementById("day");
   const dates = [...new Set(data.map(r => r.date))].sort((a,b) => new Date(b) - new Date(a));
   dates.forEach(d => s.add(new Option(d, d)));
   if (dates.length) s.value = dates[0];
+
   s.onchange = updateView;
+  document.getElementById("searchInput").oninput = updateView;
+  document.getElementById("exportBtn").onclick = exportCSV;
+
   updateView();
 }
+
 function updateView() {
-  const date = document.getElementById("day").value;
-  if (!date) return;
-  // Daily table
+  const selectedDate = document.getElementById("day").value;
+  const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+
+  if (!selectedDate) return;
+
+  // Daily table + search filter
   const tb = document.querySelector("#dailyTable tbody");
   tb.innerHTML = "";
-  const day = data.filter(r => r.date === date);
+  const dayEntries = data.filter(r => r.date === selectedDate);
+  const filtered = searchTerm
+    ? dayEntries.filter(r => r.desc.toLowerCase().includes(searchTerm) || r.type.toLowerCase().includes(searchTerm))
+    : dayEntries;
+
   let net = 0;
-  day.forEach(i => {
-    const cls = i.type.toLowerCase().replace(/\s+/g, "-");
-    tb.innerHTML += `<tr><td>${i.desc || "—"}</td><td class="${cls}">${i.type}</td><td class="${cls}">${i.amount.toFixed(2)}</td></tr>`;
-    net += i.type === "Income" ? i.amount : (["Expenses", "In-shop Expenses", "Missing", "BOC Deposit", "Investment"].includes(i.type) ? -i.amount : 0);
+  filtered.forEach(i => {
+    const typeClass = `type-${i.type.toLowerCase().replace(/\s+/g, "-")}`;
+    tb.innerHTML += `
+      <tr>
+        <td>${i.date}</td>
+        <td>${i.desc || "—"}</td>
+        <td class="${typeClass}">${i.type}</td>
+        <td class="${typeClass}">${i.amount.toLocaleString('si-LK', {minimumFractionDigits:2})}</td>
+      </tr>`;
+    net += i.type === "Income" ? i.amount : (["Expenses","In-shop Expenses","Missing","BOC Deposit","RDB Deposit","Investment"].includes(i.type) ? -i.amount : 0);
   });
-  const b = document.getElementById("dayBalance");
-  b.textContent = `${date} අවසාන ලාභය: Rs. ${net.toFixed(2)}`;
-  b.style.display = day.length ? "block" : "none";
-  document.getElementById("dailyTable").style.display = day.length ? "table" : "none";
-  const up = new Date(date);
-  const past = data.filter(r => new Date(r.date) <= up);
+
+  const balanceEl = document.getElementById("dayBalance");
+  balanceEl.textContent = `${selectedDate} අවසාන ලාභය: Rs. ${net.toLocaleString('si-LK', {minimumFractionDigits:2})}`;
+  balanceEl.className = net >= 0 ? "profit-positive" : "profit-negative";
+  balanceEl.style.display = filtered.length ? "block" : "none";
+  document.getElementById("dailySection").style.display = filtered.length ? "block" : "none";
+
+  // ── Monthly / Cumulative ─────────────────────────────────────
+  const upToDate = new Date(selectedDate);
+  const past = data.filter(r => new Date(r.date) <= upToDate);
+
   if (!past.length) {
-    document.getElementById("monthlyProfit").innerHTML = '<div style="padding:50px;text-align:center;color:#aaa">No data</div>';
     document.getElementById("monthlyProfit").style.display = "block";
-    document.getElementById("chartCard").style.display = "none";
+    document.getElementById("monthlyProfit").innerHTML = '<div style="padding:80px;text-align:center;color:#777">No data yet...</div>';
     return;
   }
-  // Monthly summary
-  const m = past.reduce((o, r) => {
-    const k = r.date.slice(0, 7);
+
+  const months = past.reduce((o, r) => {
+    const k = r.date.slice(0,7);
     o[k] = (o[k] || []).concat(r);
     return o;
   }, {});
-  const ks = Object.keys(m).sort();
-  let carry = 0, prev = "";
-  ks.slice(0, -1).forEach(k => { carry += monthNet(m[k]); prev = k; });
-  const cur = m[ks.at(-1)];
-  const hand = carry + monthNet(cur);
+
+  const monthKeys = Object.keys(months).sort();
+  let carryOver = 0;
+  let previousMonth = "";
+
+  monthKeys.slice(0, -1).forEach(k => {
+    carryOver += monthNet(months[k]);
+    previousMonth = k;
+  });
+
+  const currentMonth = months[monthKeys.at(-1)];
+  const handCash = carryOver + monthNet(currentMonth);
+
+  // Summary grid
   const grid = document.getElementById("summaryGrid");
   grid.innerHTML = `
-    ${prev ? `<div class="summary-item" data-category="carry" data-prev="${prev}" data-carry="${carry}">
-      <div>Carry (${prev})</div><strong style="color:#a5b4fc">Rs.${carry.toFixed(2)}</strong></div>` : ""}
+    ${previousMonth ? `
+    <div class="summary-item" data-category="carry" data-prev="${previousMonth}" data-carry="${carryOver}">
+      <div>Carry Forward (${previousMonth})</div>
+      <strong style="color:#a5b4fc">Rs.${carryOver.toLocaleString('si-LK', {minimumFractionDigits:2})}</strong>
+    </div>` : ""}
     <div class="summary-item" data-category="Income">
-      <div>Income</div><strong class="income">Rs.${byType(cur,'Income').toFixed(2)}</strong></div>
+      <div>💰 Income</div><strong class="profit-positive">Rs.${byType(currentMonth,'Income').toLocaleString('si-LK', {minimumFractionDigits:2})}</strong>
+    </div>
     <div class="summary-item" data-category="Expenses">
-      <div>Expenses</div><strong class="expenses">Rs.${byType(cur,['Expenses','In-shop Expenses']).toFixed(2)}</strong></div>
+      <div>💸 Expenses</div><strong style="color:var(--danger)">Rs.${byType(currentMonth,['Expenses','In-shop Expenses']).toLocaleString('si-LK', {minimumFractionDigits:2})}</strong>
+    </div>
     <div class="summary-item" data-category="Missing">
-      <div>Missing</div><strong class="missing">Rs.${byType(cur,'Missing').toFixed(2)}</strong></div>
+      <div>⚠️ Missing</div><strong style="color:var(--warning)">Rs.${byType(currentMonth,'Missing').toLocaleString('si-LK', {minimumFractionDigits:2})}</strong>
+    </div>
     <div class="summary-item" data-category="Investment">
-      <div>Investment</div><strong class="investment">Rs.${byType(cur,'Investment').toFixed(2)}</strong></div>
+      <div>📈 Investment</div><strong style="color:var(--warning)">Rs.${byType(currentMonth,'Investment').toLocaleString('si-LK', {minimumFractionDigits:2})}</strong>
+    </div>
     <div class="summary-item" data-category="BOC/RDB Deposit">
-      <div>BOC/RDB</div><strong class="boc deposit">Rs.${byType(cur,['BOC Deposit','RDB Deposit']).toFixed(2)}</strong></div>
+      <div>🏦 BOC/RDB</div><strong style="color:var(--info)">Rs.${byType(currentMonth,['BOC Deposit','RDB Deposit']).toLocaleString('si-LK', {minimumFractionDigits:2})}</strong>
+    </div>
   `;
-  // Add click listeners after rendering
-  document.querySelectorAll('.summary-item').forEach(item => {
-    item.onclick = () => {
-      const cat = item.dataset.category;
-      let filtered = [];
+
+  document.querySelectorAll('.summary-item').forEach(el => {
+    el.onclick = () => {
+      const cat = el.dataset.category;
+      let items = [];
       if (cat === "carry") {
-        const prevMonthEnd = new Date(prev + "-01");
-        prevMonthEnd.setMonth(prevMonthEnd.getMonth());
-        prevMonthEnd.setDate(0); // last day of prev month
-        filtered = past.filter(r => new Date(r.date) <= prevMonthEnd);
+        const endPrev = new Date(previousMonth + "-01");
+        endPrev.setMonth(endPrev.getMonth());
+        endPrev.setDate(0);
+        items = past.filter(r => new Date(r.date) <= endPrev);
       } else if (cat === "Expenses") {
-        filtered = past.filter(r => r.type === 'Expenses' || r.type === 'In-shop Expenses');
+        items = past.filter(r => ['Expenses','In-shop Expenses'].includes(r.type));
       } else if (cat === "BOC/RDB Deposit") {
-        filtered = past.filter(r => r.type === 'BOC Deposit' || r.type === 'RDB Deposit');
+        items = past.filter(r => ['BOC Deposit','RDB Deposit'].includes(r.type));
       } else {
-        filtered = past.filter(r => r.type === cat);
+        items = past.filter(r => r.type === cat);
       }
-      showCat(cat === "carry" ? `Carry forward (${prev})` : cat, filtered);
+      showDetail(cat === "carry" ? `Carry forward (${previousMonth})` : cat, items);
     };
   });
-  document.getElementById("finalCash").textContent = `Hand Cash: Rs.${hand.toFixed(2)}`;
+
+  const finalEl = document.getElementById("finalCash");
+  finalEl.innerHTML = `Hand Cash: <span class="${handCash >= 0 ? 'profit-positive' : 'profit-negative'}">Rs.${handCash.toLocaleString('si-LK', {minimumFractionDigits:2})}</span>`;
   document.getElementById("monthlyProfit").style.display = "block";
-  // Chart part (unchanged, shortened)
-  const dn = past.reduce((o,r) => {
-    o[r.date] = (o[r.date] || 0) + (r.type==="Income" ? r.amount : (["Expenses","In-shop Expenses","Missing","BOC Deposit","RDB Deposit","Investment"].includes(r.type) ? -r.amount : 0));
+
+  // ── Charts ───────────────────────────────────────────────────
+  updateCharts(past, currentMonth);
+  document.getElementById("chartsSection").style.display = "block";
+}
+
+function updateCharts(allData, currentMonthData) {
+  // Cumulative + Daily line chart
+  const dailyNet = allData.reduce((o,r) => {
+    const sign = r.type==="Income" ? 1 : (["Expenses","In-shop Expenses","Missing","BOC Deposit","RDB Deposit","Investment"].includes(r.type) ? -1 : 0);
+    o[r.date] = (o[r.date] || 0) + sign * r.amount;
     return o;
   }, {});
-  const ds = Object.keys(dn).sort();
-  const vs = ds.map(k=>dn[k]);
-  let tot = 0;
-  const cu = vs.map(v => tot += v);
-  document.getElementById("chartCard").style.display = "block";
-  if (chart) {
-    chart.data.labels = ds;
-    chart.data.datasets[0].data = cu;
-    chart.data.datasets[1].data = vs;
-    chart.update();
-    return;
-  }
-  chart = new Chart(document.getElementById("profitChart"), {
-    type: "line",
-    data: {
-      labels: ds,
-      datasets: [
-        { label: "Cumulative", data: cu, borderColor: "#a78bfa", backgroundColor: "#a78bfa20", fill: true, tension: .38, yAxisID: "y" },
-        { label: "Daily", data: vs, borderColor: "#f472b6", borderDash: [5,3], tension: .25, yAxisID: "y1" }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: "top", labels: { color: "#d1d5db" } } },
-      scales: {
-        y: { position: "left", title: { display: true, text: "Cumulative", color: "#d1d5db" }, ticks: { color: "#b0a0d0" } },
-        y1: { position: "right", title: { display: true, text: "Daily", color: "#d1d5db" }, grid: { drawOnChartArea: false }, ticks: { color: "#b0a0d0" } }
+
+  const labels = Object.keys(dailyNet).sort();
+  const dailyValues = labels.map(k => dailyNet[k]);
+  let cumulative = 0;
+  const cumValues = dailyValues.map(v => cumulative += v);
+
+  if (profitChart) {
+    profitChart.data.labels = labels;
+    profitChart.data.datasets[0].data = cumValues;
+    profitChart.data.datasets[1].data = dailyValues;
+    profitChart.update();
+  } else {
+    profitChart = new Chart(document.getElementById("profitChart"), {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "Cumulative", data: cumValues, borderColor: "#a78bfa", backgroundColor: "rgba(167,139,250,0.15)", fill: true, tension: 0.35, yAxisID: "y" },
+          { label: "Daily Net", data: dailyValues, borderColor: "#f472b6", borderDash: [6,4], tension: 0.28, yAxisID: "y1" }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "top", labels: { color: "#d1d5db" } } },
+        scales: {
+          x: { ticks: { color: "#b0a0d0" } },
+          y: { position: "left", title: { display: true, text: "Cumulative (Rs.)", color: "#d1d5db" }, ticks: { color: "#b0a0d0" } },
+          y1: { position: "right", title: { display: true, text: "Daily Net", color: "#d1d5db" }, grid: { drawOnChartArea: false }, ticks: { color: "#b0a0d0" } }
+        }
       }
-    }
+    });
+  }
+
+  // Pie chart - Current month category breakdown
+  const catSums = {};
+  currentMonthData.forEach(r => {
+    const t = r.type;
+    catSums[t] = (catSums[t] || 0) + (["Income"].includes(t) ? r.amount : -r.amount);
   });
+
+  const pieData = Object.entries(catSums).map(([label, value]) => ({label, value: Math.abs(value)}));
+  const pieColors = ["#34d399","#f87171","#fbbf24","#60a5fa","#a78bfa","#f472b6","#ec4899"];
+
+  if (pieChart) {
+    pieChart.data.labels = pieData.map(d => d.label);
+    pieChart.data.datasets[0].data = pieData.map(d => d.value);
+    pieChart.update();
+  } else {
+    pieChart = new Chart(document.getElementById("pieChart"), {
+      type: "doughnut",
+      data: {
+        labels: pieData.map(d => d.label),
+        datasets: [{
+          data: pieData.map(d => d.value),
+          backgroundColor: pieColors,
+          borderColor: "rgba(30,20,60,0.8)",
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom", labels: { color: "#d1d5db", padding: 16 } },
+          title: { display: true, text: "Current Month Breakdown", color: "#f0eaff", font: { size: 16 } }
+        },
+        cutout: "60%"
+      }
+    });
+  }
 }
-function showCat(title, items) {
+
+function showDetail(title, items) {
   document.getElementById("detailTitle").textContent = title;
   const tb = document.querySelector("#detailTable tbody");
-  tb.innerHTML = items.map(r => `<tr><td>${r.date}</td><td>${r.desc || "-"}</td><td>${r.amount.toFixed(2)}</td></tr>`).join("");
+  tb.innerHTML = items.map(r => `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.desc || "—"}</td>
+      <td>${r.amount.toLocaleString('si-LK', {minimumFractionDigits:2})}</td>
+    </tr>`).join("");
   document.getElementById("detailModal").style.display = "flex";
 }
+
 function byType(items, types) {
   const t = [].concat(types);
   return items.filter(r => t.includes(r.type)).reduce((s, r) => s + r.amount, 0);
 }
+
 function monthNet(items) {
   return byType(items, "Income") -
          byType(items, ["Expenses", "In-shop Expenses"]) -
          byType(items, "Missing") -
          byType(items, ["BOC Deposit", "RDB Deposit"]) -
          byType(items, "Investment");
+}
+
+function exportCSV() {
+  const selectedDate = document.getElementById("day").value;
+  if (!selectedDate) return alert("කරුණාකර දවසක් තෝරන්න");
+
+  const month = selectedDate.slice(0,7);
+  const monthData = data.filter(r => r.date.startsWith(month));
+
+  if (!monthData.length) return alert("මේ මාසයේ data නැහැ");
+
+  let csv = "Date,Description,Type,Amount (Rs.)\n";
+  monthData.forEach(r => {
+    csv += `"${r.date}","${r.desc.replace(/"/g,'""')}","${r.type}",${r.amount}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `KC_Money_${month}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
