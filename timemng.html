@@ -3,122 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A/L Tech Study Dashboard</title>
+<title>A/L Tech Study Dashboard - Premium</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
 <style>
+    :root {
+        --primary: #00ff88;
+        --accent: #3b82f6;
+        --bg: #0f172a;
+    }
+    
     body{
         font-family: 'Noto Sans Sinhala', Arial, sans-serif;
         background: linear-gradient(135deg, #0f172a, #1e293b);
         color: white;
         margin: 0;
         padding: 20px;
+        min-height: 100vh;
     }
+    
     h1, h2 { text-align: center; }
-    .container { max-width: 1200px; margin: auto; }
+    .container { max-width: 1320px; margin: auto; }
 
     .card{
         background: rgba(255,255,255,0.08);
-        padding: 20px;
-        margin: 15px 0;
-        border-radius: 15px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 24px;
+        margin: 18px 0;
+        border-radius: 20px;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
     }
-    .current { border: 3px solid #00ff88; box-shadow: 0 0 25px #00ff88; }
-    .next { border: 2px solid #3b82f6; }
+    .card:hover { transform: translateY(-4px); }
 
-    .subject { font-size: 28px; font-weight: bold; margin-bottom: 8px; }
-    .task { font-size: 20px; margin: 8px 0; }
-    .timer { font-size: 42px; color: #00ff88; font-weight: bold; margin: 15px 0; }
+    .current { border: 4px solid var(--primary); box-shadow: 0 0 30px rgba(0, 255, 136, 0.4); }
+    .next { border: 3px solid var(--accent); }
+
+    .subject { font-size: 30px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+    .task { font-size: 21px; margin: 10px 0; }
+    .timer { font-size: 48px; color: var(--primary); font-weight: bold; margin: 18px 0; letter-spacing: 2px; }
 
     .checkbox {
-        width: 32px; height: 32px; border: 3px solid #64748b; border-radius: 8px;
+        width: 38px; height: 38px; border: 3px solid #64748b; border-radius: 10px;
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 24px; cursor: pointer; flex-shrink: 0;
-        transition: all 0.2s ease;
+        font-size: 26px; cursor: pointer; flex-shrink: 0;
+        transition: all 0.25s ease;
     }
-    .checkbox.completed { background: #16a34a; border-color: #16a34a; color: white; }
-    .checkbox.disabled { cursor: not-allowed; opacity: 0.4; }
+    .checkbox.completed { background: #16a34a; border-color: #16a34a; color: white; transform: scale(1.1); }
 
     .task-row {
-        display: flex; align-items: center; gap: 15px;
-        padding: 12px; background: rgba(255,255,255,0.05);
-        border-radius: 10px; margin-bottom: 8px;
-        transition: transform 0.2s ease;
+        display: flex; align-items: center; gap: 18px;
+        padding: 16px; background: rgba(255,255,255,0.06);
+        border-radius: 14px; margin-bottom: 10px;
+        transition: all 0.3s ease;
     }
-    .task-row:hover { transform: translateX(5px); }
-    .time-info { min-width: 110px; opacity: 0.8; }
+    .task-row:hover { transform: translateX(8px); background: rgba(255,255,255,0.1); }
+    .time-info { min-width: 120px; opacity: 0.85; font-weight: 500; }
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 15px;
-        margin: 20px 0;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+        margin: 24px 0;
     }
     .stat-card {
-        background: rgba(255,255,255,0.1);
-        padding: 15px;
-        border-radius: 12px;
+        background: rgba(255,255,255,0.09);
+        padding: 20px;
+        border-radius: 16px;
         text-align: center;
-        border-top: 4px solid #3b82f6;
-        transition: transform 0.3s ease;
+        border-top: 5px solid var(--accent);
+        transition: all 0.3s ease;
     }
-    .stat-card:hover { transform: translateY(-5px); }
-    .stat-card h3 { margin: 10px 0 5px 0; font-size: 28px; }
-    .stat-card.success { border-top-color: #00ff88; }
-    
-    .charts-flex {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin-top: 25px;
+    .stat-card:hover { transform: translateY(-8px); }
+    .stat-card h3 { margin: 12px 0 6px 0; font-size: 32px; }
+    .stat-card.success { border-top-color: var(--primary); }
+
+    .charts-flex { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 3px; }
+    .chart-container { flex: 1; min-width: 320px; background: rgba(0,0,0,0.25); padding: 20px; border-radius: 16px;max-height: 300px; }
+
+    /* Premium Extras */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+    .streak {
+        background: linear-gradient(90deg, #f59e0b, #ef4444);
+        padding: 12px 24px;
+        border-radius: 9999px;
+        font-weight: bold;
+        display: flex; align-items: center; gap: 10px;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     }
-    .chart-container { 
-        flex: 1;
-        min-width: 300px; 
-        background: rgba(0,0,0,0.2); 
-        padding: 15px; 
-        border-radius: 12px;
-        max-height: 300px; /* Chart එක ඕනෑවට වඩා ලොකුවීම වැලැක්වීමට */
+
+    .pomodoro {
+        text-align: center;
+        background: rgba(0,0,0,0.3);
+        padding: 20px;
+        border-radius: 16px;
+        margin: 15px 0;
     }
-    .chart-container h3 { margin-top: 0; text-align: center; font-size: 18px;}
+    .pomo-timer { font-size: 52px; font-weight: bold; color: #f59e0b; margin: 15px 0; }
+    .btn {
+        padding: 10px 22px;
+        border-radius: 9999px;
+        border: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    .btn:hover { background: var(--primary); color: black; transform: scale(1.05); }
+    .btn-primary { background: var(--primary); color: black; }
+
+    .tab-bar {
+        display: flex; background: rgba(255,255,255,0.05); border-radius: 9999px; padding: 6px; margin: 20px 0;
+    }
+    .tab {
+        flex: 1; padding: 12px; text-align: center; border-radius: 9999px; cursor: pointer; transition: all 0.3s;
+    }
+    .tab.active { background: var(--primary); color: black; font-weight: bold; }
+
+    .quote { font-style: italic; opacity: 0.9; text-align: center; margin: 20px 0; padding: 15px; border-left: 4px solid var(--primary); }
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>📊 A/L Technology Study Dashboard</h1>
-    <div id="today" style="text-align:center; font-size:22px; margin-bottom:20px;"></div>
+    <div class="header">
+        <h1>🚀 A/L Tech Study Dashboard - Premium</h1>
+        <div class="streak" id="streakDisplay">
+            <i class="fas fa-fire"></i> <span id="streakCount"></span> දින streak
+        </div>
+    </div>
+    
+    <div id="today" style="text-align:center; font-size:24px; margin-bottom:25px; font-weight:500;"></div>
+
+    <!-- Pomodoro Timer -->
 
     <div id="currentTask" class="card current"></div>
+    <div class="card pomodoro">
+        <h3><i class="fas fa-clock"></i> Pomodoro Timer</h3>
+        <div class="pomo-timer" id="pomoTimer">25:00</div>
+        <div>
+            <button class="btn btn-primary" onclick="togglePomodoro()">▶ Start</button>
+            <button class="btn" onclick="pausePomodoro()" style="margin:0 8px;">Pause</button>
+            <button class="btn" onclick="resetPomodoro()">Reset</button>
+        </div>
+        <small id="pomoStatus">25 විනාඩි Study Session</small>
+    </div>
     <div id="nextTask" class="card next"></div>
 
-    <div class="card">
-        <h2>අද දිනයේ කාර්යයන්</h2>
-        <div id="allTasksList"></div>
+    <!-- Tabs -->
+    <div class="tab-bar">
+        <div class="tab active" onclick="switchTab(0)">අද කාර්යයන්</div>
+        <div class="tab" onclick="switchTab(1)">සතිපතා සාරාංශය</div>
+        <div class="tab" onclick="switchTab(2)">Analytics</div>
     </div>
 
-    <div class="card">
-        <h2>📈 Analytics & Progress</h2>
-        <div class="stats-grid" id="statsGrid"></div>
-        
-        <div class="charts-flex">
+    <div id="tab0">
+        <div class="card">
+            <h2>📋 අද දිනයේ කාර්යයන්</h2>
+            <div id="allTasksList"></div>
+        </div>
+    </div>
+
+    <div id="tab1" style="display:none;">
+        <div class="card">
+            <h2>📅 සතිපතා සාරාංශය</h2>
+            <div class="stats-grid" id="weeklyStats"></div>
             <div class="chart-container">
-                <h3>විෂය අනුව කැපකළ කාලය (පැය)</h3>
-                <canvas id="subjectChart"></canvas>
-            </div>
-            
-            <div class="chart-container">
-                <h3>අද දින නිමකිරීමේ අනුපාතය</h3>
-                <canvas id="dailyChart"></canvas>
+                <h3>පසුගිය 7 දින ප්‍රගතිය</h3>
+                <canvas id="weeklyChart"></canvas>
             </div>
         </div>
     </div>
-</div>
 
+    <div id="tab2" style="display:none;">
+        <div class="card">
+            <h2>📈 Analytics & Progress</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="charts-flex">
+                <div class="chart-container">
+                    <h3>විෂය අනුව කැපකළ කාලය (පැය)</h3>
+                    <canvas id="subjectChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>අද දින නිමකිරීමේ අනුපාතය</h3>
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="quote" id="motivationalQuote"></div>
+    </div>
+
+    <div style="text-align:center; margin-top:30px;">
+        <button class="btn" onclick="exportData()"><i class="fas fa-download"></i> Export</button>
+        <button class="btn" onclick="importData()" style="margin:0 12px;"><i class="fas fa-upload"></i> Import</button>
+        <button class="btn" onclick="resetToday()" style="background:#ef4444;"><i class="fas fa-trash"></i> අද Reset</button>
+    </div>
+</div>
 <script>
 // ==================== SCHEDULE ====================
 const schedule = {
@@ -178,7 +265,59 @@ const schedule = {
 };
 
 
+// Data
 let completedTasks = JSON.parse(localStorage.getItem('studyCompletedTasks')) || {};
+let currentTab = 0;
+
+// Pomodoro Variables
+let pomoTime = 25 * 60;
+let pomoInterval = null;
+let isRunning = false;
+
+// ==================== MOTIVATIONAL QUOTES ====================
+const quotes = [
+    "උත්සාහයෙන් කරන වැඩ කිසිවිටක නිෂ්ඵල නොවේ.",
+    "අධ්‍යයනය යනු ඔබේ අනාගතය ගොඩනැගීමයි.",
+    "එක පියවරක් එක පියවරක් ලෙස ඉදිරියට යන්න.",
+    "ඔබේ අධිෂ්ඨානය ඔබේ ජයග්‍රහණයේ යතුරයි.",
+    "දැන් කරන වැඩ අනාගතයේ ඔබට ස්තුති කරයි.",
+    "ඔබේ අනාගතය ඔබේ අතේ තියෙනවා.",
+    "කාලය නාස්ති කිරීම යනු සිහිනා නාස්ති කිරීමයි."
+];
+
+function updateQuote() {
+    const random = quotes[Math.floor(Math.random() * quotes.length)];
+    const quoteElement = document.getElementById('motivationalQuote');
+    if (quoteElement) {
+        quoteElement.textContent = `"${random}"`;
+    }
+}
+
+// ==================== FIXED STREAK ====================
+function updateStreak() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    let streak = parseInt(localStorage.getItem('studyStreak') || '0');
+    let lastDate = localStorage.getItem('lastStudyDate');
+
+    if (lastDate === todayStr) {
+        document.getElementById('streakCount').textContent = streak;
+        return;
+    }
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    if (lastDate === yesterdayStr) {
+        streak++;
+    } else {
+        streak = 1;
+    }
+
+    localStorage.setItem('studyStreak', streak);
+    localStorage.setItem('lastStudyDate', todayStr);
+    document.getElementById('streakCount').textContent = streak;
+}
 
 // ==================== CORE FUNCTIONS ====================
 function saveData() {
@@ -204,22 +343,59 @@ function calculateDurationInHours(startStr, endStr) {
     let end = parseTime(endStr);
     let startMins = start.hour * 60 + start.min;
     let endMins = end.hour * 60 + end.min;
-    
     let diff = endMins - startMins;
     if (diff < 0) diff += 1440;
     return parseFloat((diff / 60).toFixed(2));
 }
 
-function isWithin15Min(currentEnd, now) {
-    const end = parseTime(currentEnd);
-    const endMinutes = end.hour * 60 + end.min;
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-    let diff = endMinutes - nowMinutes;
-    if (diff < 0) diff += 1440;
-    return diff <= 15;
+function isTodayComplete(day) {
+    const tasks = schedule[day] || [];
+    return tasks.length > 0 && tasks.every((_, i) => completedTasks[getTaskKey(day, i)]);
 }
 
-// ==================== LIVE TIMER FUNCTION (EVERY 1 SECOND) ====================
+// ==================== POMODORO ====================
+function updatePomoDisplay() {
+    const min = Math.floor(pomoTime / 60);
+    const sec = pomoTime % 60;
+    document.getElementById('pomoTimer').textContent = `${min}:${sec.toString().padStart(2,'0')}`;
+}
+
+function togglePomodoro() {
+    if (isRunning) {
+        clearInterval(pomoInterval);
+        isRunning = false;
+        document.querySelector('.btn-primary').textContent = '▶ Start';
+    } else {
+        isRunning = true;
+        document.querySelector('.btn-primary').textContent = '⏸ Pause';
+        pomoInterval = setInterval(() => {
+            pomoTime--;
+            updatePomoDisplay();
+            if (pomoTime <= 0) {
+                clearInterval(pomoInterval);
+                isRunning = false;
+                alert("⏰ Pomodoro Session එක අවසන්! විවේකයක් ගන්න.");
+                resetPomodoro();
+            }
+        }, 1000);
+    }
+}
+
+function pausePomodoro() {
+    clearInterval(pomoInterval);
+    isRunning = false;
+    document.querySelector('.btn-primary').textContent = '▶ Start';
+}
+
+function resetPomodoro() {
+    clearInterval(pomoInterval);
+    isRunning = false;
+    pomoTime = 25 * 60;
+    updatePomoDisplay();
+    document.querySelector('.btn-primary').textContent = '▶ Start';
+}
+
+// ==================== LIVE TIMER ====================
 function updateTimerOnly() {
     const now = new Date();
     const day = now.toLocaleDateString('en-US', {weekday: 'long'});
@@ -249,17 +425,101 @@ function updateTimerOnly() {
     if (current) {
         const key = getTaskKey(day, currentIndex);
         const isDone = !!completedTasks[key];
-        const canTick = isWithin15Min(current.end, now) || isDone;
         let remain = Math.max(0, Math.floor((current.endDate - now) / 1000));
 
         currentDiv.innerHTML = `
-            <div class="subject">🟢 ${current.subject}</div>
-            <div class="task">${current.task}</div>
-            <div class="small">${current.start} - ${current.end}</div>
-            <div class="timer">${formatTime(remain)}</div>
-            <div>ඉතිරි කාලය</div>
-            <span class="checkbox ${isDone ? 'completed' : ''} ${!canTick ? 'disabled' : ''}" 
-                  onclick="${canTick ? `toggleTask('${day}', ${currentIndex})` : ''}">${isDone ? '✔' : ''}</span>
+<div class="task-card">
+    <!-- විෂය (Subject) -->
+    <div class="subject" style="
+        font-size: 40px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #a5b4fc;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    ">🟢 ${current.subject}</div>
+
+    <!-- කාර්යය (Task) -->
+    <div class="task" style="
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.4;
+        padding-right: 40px;
+        letter-spacing: 0.3px;
+    ">${current.task}</div>
+<br>
+    <!-- වේලාව (Time) -->
+    <center>
+    <div class="small" style="
+        font-size: 20px;
+        color: #cbd5e1;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 5px 14px;
+        border-radius: 30px;
+        width: fit-content;
+        align="center";
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    ">${current.start} - ${current.end}</div>
+    </center>
+<br>
+    <!-- තත්පර ගණකය සහ ඉතිරි කාලය (Timer Box) -->
+    <div class="timer-container" style="
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+        border-left: 4px solid #6366f1;
+        padding: 14px 18px;
+        border-radius: 12px;
+        margin-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.03);
+        border-right: 1px solid rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    ">
+        <div style="
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        ">ඉතිරි කාලය</div>
+        
+        <div class="timer" style="
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        ">${formatTime(remain)}</div>
+    </div>
+
+    <!-- චෙක්බොක්ස් එක (Checkbox) -->
+    <span class="checkbox ${isDone ? 'completed' : ''}" 
+          onclick="toggleTask('${day}', ${currentIndex})" 
+          style="
+              position: absolute;
+              top: 24px;
+              right: 24px;
+              width: 30px;
+              height: 30px;
+              border: 2px solid ${isDone ? '#10b981' : 'rgba(255, 255, 255, 0.2)'};
+              background-color: ${isDone ? '#10b981' : 'rgba(255, 255, 255, 0.03)'};
+              color: #ffffff;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              font-size: 0.9rem;
+              font-weight: bold;
+              transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+              box-shadow: ${isDone ? '0 0 15px rgba(16, 185, 129, 0.4)' : 'none'};
+          ">${isDone ? '✔' : ''}</span>
+</div>
+
         `;
     } else {
         currentDiv.innerHTML = `<div class="subject">😴 දැන් සැලසුම් කළ කාර්යයන් නැත</div>`;
@@ -267,45 +527,19 @@ function updateTimerOnly() {
 
     document.getElementById("nextTask").innerHTML = next ? 
         `<div class="subject">⏭ ඊළඟ කාර්යය</div><div class="task">${next.subject} - ${next.task}</div>` : 
-        `<div class="subject">🎉 අද දිනයේ සියලු වැඩ අවසන්!</div>`;
+        `<div class="subject">🎉 අද දිනයේ සියලු වැඩ අවසන්! 🎉</div>`;
 }
 
-// ==================== DASHBOARD REFRESH FUNCTION (EVERY 20 SECONDS) ====================
-function updateDashboardData() {
-    const now = new Date();
-    const day = now.toLocaleDateString('en-US', {weekday: 'long'});
-    const tasks = schedule[day] || [];
-    
-    let currentIndex = -1;
-    for (let i = 0; i < tasks.length; i++) {
-        const t = tasks[i];
-        let start = new Date(), end = new Date();
-        let [sh, sm] = t.start.split(":");
-        let [eh, em] = t.end.split(":");
-        start.setHours(sh, sm, 0, 0);
-        end.setHours(eh, em, 0, 0);
-        if (now >= start && now <= end) currentIndex = i;
-    }
+// ==================== DASHBOARD & ANALYTICS ====================
+let subjectChart, dailyChart, weeklyChart;
 
-    renderAllTasks(day, tasks, currentIndex);
-    renderAnalytics(day, tasks);
-}
-
-function toggleTask(day, index) {
-    const key = getTaskKey(day, index);
-    completedTasks[key] = !completedTasks[key];
-    saveData();
-    updateTimerOnly();
-    updateDashboardData(); // ටික් එක දැමූ සැනින් ප්‍රස්ථාර යාවත්කාලීන කරයි
-}
-
-function renderAllTasks(day, tasks, currentIndex) {
+function renderAllTasks(day, tasks) {
     let html = '';
     tasks.forEach((t, i) => {
         const key = getTaskKey(day, i);
         const isDone = !!completedTasks[key];
         html += `
-            <div class="task-row ${i === currentIndex ? 'current' : ''}">
+            <div class="task-row">
                 <span class="checkbox ${isDone ? 'completed' : ''}" onclick="toggleTask('${day}', ${i})">${isDone ? '✔' : ''}</span>
                 <div class="time-info">${t.start} - ${t.end}</div>
                 <div style="flex:1"><strong>${t.subject}</strong> — ${t.task}</div>
@@ -314,8 +548,32 @@ function renderAllTasks(day, tasks, currentIndex) {
     document.getElementById("allTasksList").innerHTML = html;
 }
 
-// ==================== ANALYTICS & CHARTS ====================
-let subjectChart, dailyChart;
+function toggleTask(day, index) {
+    const key = getTaskKey(day, index);
+    completedTasks[key] = !completedTasks[key];
+    saveData();
+    
+    if (completedTasks[key]) updateStreak();
+    if (isTodayComplete(day)) triggerConfetti();
+    
+    updateTimerOnly();
+    updateDashboardData();
+}
+
+function triggerConfetti() {
+    for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.fontSize = '24px';
+            confetti.textContent = ['🎉','🏆','⭐','🔥'][Math.floor(Math.random()*4)];
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 4000);
+        }, i * 30);
+    }
+}
 
 function renderAnalytics(day, todayTasks) {
     const todayCompleted = todayTasks.filter((_, i) => completedTasks[getTaskKey(day, i)]).length;
@@ -327,7 +585,6 @@ function renderAnalytics(day, todayTasks) {
     todayTasks.forEach((t, i) => {
         const duration = calculateDurationInHours(t.start, t.end);
         if (!subjectHours[t.subject]) subjectHours[t.subject] = 0;
-        
         if (completedTasks[getTaskKey(day, i)]) {
             subjectHours[t.subject] += duration;
             totalHoursStudied += duration;
@@ -349,45 +606,111 @@ function renderAnalytics(day, todayTasks) {
         type: 'bar',
         data: {
             labels: subjects,
-            datasets: [{
-                label: 'වැඩ කළ පැය ගණන',
-                data: hoursData,
-                backgroundColor: ['#00ff88', '#3b82f6', '#a855f7', '#f59e0b'],
-                borderRadius: 5
-            }]
+            datasets: [{ label: 'පැය ගණන', data: hoursData, backgroundColor: ['#00ff88','#3b82f6','#a855f7','#f59e0b'], borderRadius: 8 }]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, // උස පාලනය කිරීමට මෙය අත්‍යවශ්‍යයි
-            animation: { duration: 1000, easing: 'easeOutBack' },
-            scales: { y: { beginAtZero: true, title: { display: true, text: 'පැය (Hours)' } } } 
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
 
     if (dailyChart) dailyChart.destroy();
     dailyChart = new Chart(document.getElementById('dailyChart'), {
         type: 'doughnut',
         data: {
-            labels: ['සම්පූර්ණයි (%)', 'ඉතිරි (%)'],
-            datasets: [{ data: [todayProgress, 100 - todayProgress], backgroundColor: ['#00ff88', '#334155'], borderWidth: 0 }]
+            labels: ['සම්පූර්ණයි', 'ඉතිරි'],
+            datasets: [{ data: [todayProgress, 100 - todayProgress], backgroundColor: ['#00ff88', '#475569'] }]
         },
-        options: { 
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { animateScale: true, animateRotate: true, duration: 1000, easing: 'easeOutElastic' }
-        }
+        options: { responsive: true, maintainAspectRatio: false }
     });
 }
 
-// ==================== INITIALIZATION & TIMERS ====================
+function renderWeekly() {
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const progressData = days.map(day => {
+        const tasks = schedule[day] || [];
+        const done = tasks.filter((_,i) => completedTasks[getTaskKey(day,i)]).length;
+        return tasks.length ? Math.round(done / tasks.length * 100) : 0;
+    });
+
+    if (weeklyChart) weeklyChart.destroy();
+    weeklyChart = new Chart(document.getElementById('weeklyChart'), {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [{ label: 'ප්‍රගතිය (%)', data: progressData, borderColor: '#00ff88', tension: 0.4, borderWidth: 4 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
+function updateDashboardData() {
+    const now = new Date();
+    const day = now.toLocaleDateString('en-US', {weekday: 'long'});
+    const tasks = schedule[day] || [];
+    renderAllTasks(day, tasks);
+    renderAnalytics(day, tasks);
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i === tab));
+    document.getElementById('tab0').style.display = tab === 0 ? 'block' : 'none';
+    document.getElementById('tab1').style.display = tab === 1 ? 'block' : 'none';
+    document.getElementById('tab2').style.display = tab === 2 ? 'block' : 'none';
+    
+    if (tab === 1) renderWeekly();
+}
+
+// Data Export / Import / Reset
+function exportData() {
+    const data = { completedTasks, exportDate: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `study-progress-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = e => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                completedTasks = data.completedTasks || completedTasks;
+                saveData();
+                location.reload();
+            } catch(e) { alert("Import අසාර්ථකයි"); }
+        };
+        reader.readAsText(e.target.files[0]);
+    };
+    input.click();
+}
+
+function resetToday() {
+    if (confirm("අද දිනයේ සියලු කාර්යයන් reset කරන්නද?")) {
+        const now = new Date();
+        const day = now.toLocaleDateString('en-US', {weekday: 'long'});
+        (schedule[day] || []).forEach((_,i) => delete completedTasks[getTaskKey(day,i)]);
+        saveData();
+        updateTimerOnly();
+        updateDashboardData();
+    }
+}
+
+// ==================== INITIALIZATION ====================
+updateStreak();
 updateTimerOnly();
 updateDashboardData();
+updatePomoDisplay();
+updateQuote();   // ← Quotes සඳහා
 
-// ටයිමරය සෑම තත්පර 1කට වරක් (1000ms) ඩවුන් වෙයි
-setInterval(updateTimerOnly, 1000); 
+setInterval(updateTimerOnly, 1000);
+setInterval(() => { if (currentTab === 2) updateDashboardData(); }, 20000);
 
-// ප්‍රස්ථාර සහ අනෙකුත් දත්ත සෑම තත්පර 20කට වරක් (20000ms) රීෆ්‍රෙෂ් වෙයි
-setInterval(updateDashboardData, 20000); 
+// ටිකක් කාලයකට එක පාරක් quote වෙනස් කරන්න
+setInterval(updateQuote, 45000); // 45 seconds
 </script>
 </body>
 </html>
