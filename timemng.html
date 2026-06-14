@@ -209,59 +209,261 @@
 <script>
 // ==================== SCHEDULE ====================
 const schedule = {
-"Monday":[
-    {start:"03:00",end:"05:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"සිද්ධාන්ත / ක්‍රමලේඛනය (Theory/Programming)"},
-    {start:"15:00",end:"17:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"ක්‍රමලේඛන පුහුණුව / සටහන් (Programming Practice)"},
-    {start:"17:00",end:"19:00",subject:"SFT (විද්‍යාව සඳහා තාක්ෂණය)",task:"ගණන් + සිද්ධාන්ත"},
-    {start:"20:00",end:"21:30",subject:"ET (ඉංජිනේරු තාක්ෂණය)",task:"පුනරීක්ෂණ / ප්‍රායෝගික පරීක්ෂණ (Revision/Practical)"},
-    {start:"22:00", end:"23:00", subject:"ICT / SFT", task:"Past Papers + Revision (Optional)"}
-],
-"Tuesday":[
-    {start:"03:00",end:"05:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"සිද්ධාන්ත පුනරීක්ෂණය"},
-    {start:"05:00",end:"07:00",subject:"SFT (විද්‍යාව සඳහා තාක්ෂණය)",task:"ගණන් පුහුණුව"},
-    {start:"07:00",end:"09:30",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers)"},
-    {start:"09:30",end:"12:00",subject:"ET (ඉංජිනේරු තාක්ෂණය)",task:"සටහන් / පැවරුම් (Notes/Assignments)"},
-    {start:"13:00", end:"19:00", subject:"පන්ති", task:"අමතර පන්ති"},
-    {start:"19:30", end:"22:30", subject:"විවේකය", task:"පැය 3 නින්ද / Recovery Sleep"},
-    {start:"22:45", end:"23:59", subject:"ICT", task:"සැහැල්ලු පුනරීක්ෂණ (Optional)"},
-],
-"Wednesday":[
-    {start:"03:00",end:"05:00",subject:"SFT (විද්‍යාව සඳහා තාක්ෂණය)",task:"සිද්ධාන්ත පුනරීක්ෂණය"},
-    {start:"15:00",end:"17:30",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers)"},
-    {start:"17:30",end:"19:00",subject:"ET (ඉංජිනේරු තාක්ෂණය)",task:"ප්‍රායෝගික වැඩ (Practical Work)"},
-    {start:"20:00",end:"21:30",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"සටහන් / පුනරීක්ෂණ"},
-    {start:"22:00", end:"23:00", subject:"ICT (තොරතුරු තාක්ෂණය)", task:"Programming Practice / Coding (Optional)"}
-],
-"Thursday":[
-    {start:"03:00",end:"05:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"සිද්ධාන්ත / ක්‍රමලේඛනය (Theory/Programming)"},
-    {start:"15:00",end:"17:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"ක්‍රමලේඛන පුහුණුව (Programming Practice)"},
-    {start:"17:00",end:"19:00",subject:"ET (ඉංජිනේරු තාක්ෂණය)",task:"පැවරුම් / පුනරීක්ෂණ"},
-    {start:"20:00",end:"21:30",subject:"SFT (විද්‍යාව සඳහා තාක්ෂණය)",task:"පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers)"},
-    {start:"22:00", end:"23:00", subject:"ET (ඉංජිනේරු තාක්ෂණය)", task:"Revision / Notes / Practical Questions (Optional)"},
-],
-"Friday":[
-    {start:"03:00",end:"05:00",subject:"SFT (විද්‍යාව සඳහා තාක්ෂණය)",task:"සිද්ධාන්ත පුනරීක්ෂණය"},
-    {start:"15:00",end:"17:30",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"පසුගිය විභාග ප්‍රශ්න පත්‍ර (Past Papers)"},
-    {start:"17:30",end:"19:00",subject:"ET (ඉංජිනේරු තාක්ෂණය)",task:"සටහන් / ප්‍රායෝගික වැඩ"},
-    {start:"20:00",end:"21:30",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"පුනරීක්ෂණ කටයුතු"},
-    {start:"22:30", end:"23:59", subject:"Any Subject", task:"Weekly Revision / Past Papers / Weak Areas (Fixed)"}
-],
-"Saturday":[
-    {start:"03:00",end:"05:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"පන්ති සඳහා සූදානම් වීම"},
-    {start:"05:15", end:"15:00", subject:"පන්ති", task:"සතිඅන්ත පන්ති"},
-    {start:"15:30", end:"18:30", subject:"විවේකය", task:"පැය 3 නින්ද"},
-    {start:"19:00", end:"21:00", subject:"ET", task:"පන්ති වැඩ පුනරීක්ෂණය"},
-    {start:"21:15", end:"22:30", subject:"SFT", task:"අසීරු පාඩම්"},
-    {start:"22:30", end:"23:59", subject:"Any Subject", task:"Optional Revision"}
-],
-"Sunday":[
-    {start:"03:00",end:"05:00",subject:"ICT (තොරතුරු තාක්ෂණය)",task:"පන්ති සඳහා සූදානම් වීම"},
-    {start:"05:15", end:"15:00", subject:"පන්ති", task:"සතිඅන්ත පන්ති"},
-    {start:"15:30", end:"18:30", subject:"විවේකය", task:"පැය 3 නින්ද"},
-    {start:"19:00", end:"21:00", subject:"ET", task:"පන්ති වැඩ පුනරීක්ෂණය"},
-    {start:"21:15", end:"22:30", subject:"SFT", task:"සතිපතා පුනරීක්ෂණය"},
-    {start:"22:30", end:"23:59", subject:"ICT", task:"Optional Revision"}
-]
+{
+  "Monday": [
+    {
+      "start": "03:00",
+      "end": "05:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "පන්ති සඳහා සූදානම් වීම / Theory"
+    },
+    {
+      "start": "15:00",
+      "end": "17:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "ක්‍රමලේඛන පුහුණුව"
+    },
+    {
+      "start": "17:00",
+      "end": "19:00",
+      "subject": "SFT (විද්‍යාව සඳහා තාක්ෂණය)",
+      "task": "ගණන් + සිද්ධාන්ත"
+    },
+    {
+      "start": "19:30",
+      "end": "21:00",
+      "subject": "ET (ඉංජිනේරු තාක්ෂණය)",
+      "task": "පුනරීක්ෂණ / Practical"
+    },
+    {
+      "start": "21:30",
+      "end": "23:59",
+      "subject": "ICT / SFT",
+      "task": "Past Papers + Revision"
+}
+  ],
+  "Tuesday": [
+    {
+      "start": "03:00",
+      "end": "05:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "සිද්ධාන්ත පුනරීක්ෂණය + Prep for class"
+    },
+    {
+      "start": "05:00",
+      "end": "07:00",
+      "subject": "SFT (විද්‍යාව සඳහා තාක්ෂණය)",
+      "task": "ගණන් පුහුණුව"
+    },
+    {
+      "start": "07:00",
+      "end": "09:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "පසුගිය විභාග ප්‍රශ්න පත්‍ර"
+    },
+    {
+      "start": "09:30",
+      "end": "12:00",
+      "subject": "ET (ඉංජිනේරු තාක්ෂණය)",
+      "task": "සටහන් / Assignments"
+    },
+    {
+      "start": "12:30",
+      "end": "13:00",
+      "subject": "ICT",
+      "task": "Quick Prep for පන්ති"
+    },
+    {
+      "start": "13:00",
+      "end": "19:00",
+      "subject": "ICT පන්ති",
+      "task": "අමතර පන්ති"
+    },
+    {
+      "start": "19:30",
+      "end": "22:30",
+      "subject": "විවේකය",
+      "task": "නින්ද"
+    },
+    {
+      "start": "22:45",
+      "end": "23:59",
+      "subject": "ICT",
+      "task": "Optional Revision"
+    }
+  ],
+  "Wednesday": [
+    {
+      "start": "03:00",
+      "end": "05:00",
+      "subject": "SFT (විද්‍යාව සඳහා තාක්ෂණය)",
+      "task": "සිද්ධාන්ත පුනරීක්ෂණය"
+    },
+    {
+      "start": "15:00",
+      "end": "17:30",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "පසුගිය විභාග ප්‍රශ්න පත්‍ර"
+    },
+    {
+      "start": "17:30",
+      "end": "19:00",
+      "subject": "ET (ඉංජිනේරු තාක්ෂණය)",
+      "task": "ප්‍රායෝගික වැඩ"
+    },
+    {
+      "start": "20:00",
+      "end": "21:30",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "සටහන් / පුනරීක්ෂණ"
+    },
+    {
+      "start": "22:00",
+      "end": "23:59",
+      "subject": "ICT",
+      "task": "Programming Practice (Optional)"
+    }
+  ],
+  "Thursday": [
+    {
+      "start": "03:00",
+      "end": "05:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "සිද්ධාන්ත / ක්‍රමලේඛනය"
+    },
+    {
+      "start": "15:00",
+      "end": "17:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "ක්‍රමලේඛන පුහුණුව"
+    },
+    {
+      "start": "17:00",
+      "end": "19:00",
+      "subject": "ET (ඉංජිනේරු තාක්ෂණය)",
+      "task": "පැවරුම් / පුනරීක්ෂණ"
+    },
+    {
+      "start": "20:00",
+      "end": "21:30",
+      "subject": "SFT (විද්‍යාව සඳහා තාක්ෂණය)",
+      "task": "පසුගිය විභාග ප්‍රශ්න පත්‍ර"
+    },
+    {
+      "start": "22:00",
+      "end": "23:59",
+      "subject": "ET",
+      "task": "Revision (Optional)"
+    }
+  ],
+  "Friday": [
+    {
+      "start": "02:00",
+      "end": "05:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "පන්ති සඳහා සූදානම් වීම"
+    },
+    {
+      "start": "15:00",
+      "end": "17:30",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "පසුගිය විභාග ප්‍රශ්න පත්‍ර"
+    },
+    {
+      "start": "17:30",
+      "end": "19:00",
+      "subject": "ET (ඉංජිනේරු තාක්ෂණය)",
+      "task": "සටහන් / ප්‍රායෝගික"
+    },
+    {
+      "start": "20:00",
+      "end": "21:30",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "පුනරීක්ෂණ"
+    },
+    {
+      "start": "22:00",
+      "end": "23:59",
+      "subject": "Any Subject",
+      "task": "Weekly Revision / Weak Areas"
+    }
+  ],
+  "Saturday": [
+    {
+      "start": "03:00",
+      "end": "05:00",
+      "subject": "ICT (තොරතුරු තාක්ෂණය)",
+      "task": "ET පන්ති සඳහා සූදානම් වීම"
+    },
+    {
+      "start": "05:15",
+      "end": "15:00",
+      "subject": "ET පන්ති",
+      "task": "සතිඅන්ත පන්ති"
+    },
+    {
+      "start": "15:30",
+      "end": "18:30",
+      "subject": "විවේකය",
+      "task": "නින්ද"
+    },
+    {
+      "start": "19:00",
+      "end": "21:00",
+      "subject": "ET",
+      "task": "පන්ති වැඩ පුනරීක්ෂණය"
+    },
+    {
+      "start": "21:15",
+      "end": "22:30",
+      "subject": "SFT",
+      "task": "අසීරු පාඩම්"
+    },
+    {
+      "start": "22:30",
+      "end": "23:59",
+      "subject": "ICT",
+      "task": "Revision (Optional)"
+    }
+  ],
+  "Sunday": [
+    {
+      "start": "03:00",
+      "end": "05:00",
+      "subject": "SFT (විද්‍යාව සඳහා තාක්ෂණය)",
+      "task": "පන්ති සඳහා සූදානම් වීම / සිද්ධාන්ත"
+    },
+    {
+      "start": "05:15",
+      "end": "15:00",
+      "subject": "SFT පන්ති",
+      "task": "සතිඅන්ත පන්ති"
+    },
+    {
+      "start": "15:30",
+      "end": "18:30",
+      "subject": "විවේකය",
+      "task": "නින්ද"
+    },
+    {
+      "start": "19:00",
+      "end": "21:00",
+      "subject": "ET",
+      "task": "පන්ති වැඩ පුනරීක්ෂණය"
+    },
+    {
+      "start": "21:15",
+      "end": "22:30",
+      "subject": "SFT",
+      "task": "සතිපතා පුනරීක්ෂණය"
+    },
+    {
+      "start": "22:30",
+      "end": "23:59",
+      "subject": "ICT",
+      "task": "Optional Revision"
+    }
+  ]
 };
 
 
