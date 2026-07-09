@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Chat Assistant</title>
+    <style>
+        :root {
+            --bg-color: #0b141a;
+            --card-bg: #111b21;
+            --text-color: #e9edef;
+            --primary-blue: #00a884;
+            --user-bubble: #005c4b;
+            --ai-bubble: #202c33;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-wrapper {
+            width: 100%;
+            max-width: 600px;
+            height: 85vh;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #222e35;
+        }
+
+        .chat-header {
+            background-color: #202c33;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 1px solid #222e35;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-image: radial-gradient(#202c33 1px, transparent 0);
+            background-size: 15px 15px;
+        }
+
+        .msg {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-msg {
+            background-color: var(--user-bubble);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .ai-msg {
+            background-color: var(--ai-bubble);
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .input-area {
+            padding: 15px;
+            background-color: #202c33;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px;
+            background-color: #2a3942;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input[type="text"]:focus {
+            background-color: #374248;
+        }
+
+        button {
+            padding: 14px 24px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #009675;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            font-style: italic;
+            color: #8696a0;
+            display: none;
+            align-self: flex-start;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #374248; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="chat-wrapper">
+    <div class="chat-header">🤖 AI Chat Assistant</div>
+    <div class="chat-box" id="chatBox">
+        <div class="msg ai-msg">ආයුබෝවන්! මගෙන් ඕනෑම ප්‍රශ්නයක් අහන්න.</div>
+        <div class="typing-indicator id="typing">පිළිතුර ලියමින් පවතී...</div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="මෙතන Type කරන්න..." onkeydown="if(event.key === 'Enter') sendMessage()">
+        <button id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const inputElement = document.getElementById('userInput');
+        const chatBox = document.getElementById('chatBox');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        const prompt = inputElement.value.trim();
+        if (!prompt) return;
+
+        // 1. User මැසේජ් එක Chat එකට එකතු කිරීම
+        const userDiv = document.createElement('div');
+        userDiv.className = 'msg user-msg';
+        userDiv.innerText = prompt;
+        chatBox.appendChild(userDiv);
+        
+        // Input එක හිස් කිරීම
+        inputElement.value = '';
+        inputElement.disabled = true;
+        sendBtn.disabled = true;
+
+        // Typing Indicator එක පෙන්වීම සහ Scroll කිරීම
+        const typingIndicator = document.getElementById('typing');
+        chatBox.appendChild(typingIndicator); // Indicator එක අන්තිමට තියාගන්න
+        typingIndicator.style.display = 'block';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // API එකට Request එක යැවීම
+            const apiUrl = `https://workers.dev{encodeURIComponent(prompt)}`;
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) throw new Error();
+
+            const replyText = await response.text();
+
+            // 2. AI මැසේජ් එක Chat එකට එකතු කිරීම
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'msg ai-msg';
+            aiDiv.innerText = replyText;
+            chatBox.appendChild(aiDiv);
+
+        } catch (error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'msg ai-msg';
+            errorDiv.style.color = '#ff6b6b';
+            errorDiv.innerText = 'කණගාටුයි, පිළිතුර ලබාගැනීමේදී දෝෂයක් සිදුවුණා.';
+            chatBox.appendChild(errorDiv);
+        } finally {
+            // අවසාන වශයෙන් සියල්ල සාමාන්‍ය තත්ත්වයට පත් කිරීම
+            typingIndicator.style.display = 'none';
+            inputElement.disabled = false;
+            sendBtn.disabled = false;
+            inputElement.focus();
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+</script>
+
+</body>
+</html>
+
