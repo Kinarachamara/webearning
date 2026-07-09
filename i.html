@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="si">
 <head>
@@ -145,7 +144,6 @@
             align-self: flex-start;
         }
 
-        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #374248; border-radius: 10px; }
     </style>
@@ -156,7 +154,7 @@
     <div class="chat-header">🤖 AI Chat Assistant</div>
     <div class="chat-box" id="chatBox">
         <div class="msg ai-msg">ආයුබෝවන්! මගෙන් ඕනෑම ප්‍රශ්නයක් අහන්න.</div>
-        <div class="typing-indicator id="typing">පිළිතුර ලියමින් පවතී...</div>
+        <div class="typing-indicator" id="typing">පිළිතුර ලියමින් පවතී...</div>
     </div>
     <div class="input-area">
         <input type="text" id="userInput" placeholder="මෙතන Type කරන්න..." onkeydown="if(event.key === 'Enter') sendMessage()">
@@ -169,50 +167,46 @@
         const inputElement = document.getElementById('userInput');
         const chatBox = document.getElementById('chatBox');
         const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typing');
         
         const prompt = inputElement.value.trim();
         if (!prompt) return;
 
-        // 1. User මැසේජ් එක Chat එකට එකතු කිරීම
+        // User මැසේජ් එක Chat එකට එකතු කිරීම
         const userDiv = document.createElement('div');
         userDiv.className = 'msg user-msg';
         userDiv.innerText = prompt;
-        chatBox.appendChild(userDiv);
+        chatBox.insertBefore(userDiv, typingIndicator);
         
-        // Input එක හිස් කිරීම
         inputElement.value = '';
         inputElement.disabled = true;
         sendBtn.disabled = true;
 
-        // Typing Indicator එක පෙන්වීම සහ Scroll කිරීම
-        const typingIndicator = document.getElementById('typing');
-        chatBox.appendChild(typingIndicator); // Indicator එක අන්තිමට තියාගන්න
         typingIndicator.style.display = 'block';
         chatBox.scrollTop = chatBox.scrollHeight;
 
         try {
-            // API එකට Request එක යැවීම
-            const apiUrl = `https://workers.dev{encodeURIComponent(prompt)}`;
-            const response = await fetch(apiUrl);
+            // නව, ස්ථාවර නිදහස් API එකක් (DuckDuckGo AI Chat API Wrapper එකක්)
+            const apiUrl = `https://corsproxy.io{encodeURIComponent(prompt)}`;
             
+            const response = await fetch(apiUrl);
             if (!response.ok) throw new Error();
 
             const replyText = await response.text();
 
-            // 2. AI මැසේජ් එක Chat එකට එකතු කිරීම
+            // AI මැසේජ් එක Chat එකට එකතු කිරීම
             const aiDiv = document.createElement('div');
             aiDiv.className = 'msg ai-msg';
             aiDiv.innerText = replyText;
-            chatBox.appendChild(aiDiv);
+            chatBox.insertBefore(aiDiv, typingIndicator);
 
         } catch (error) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'msg ai-msg';
             errorDiv.style.color = '#ff6b6b';
-            errorDiv.innerText = 'කණගාටුයි, පිළිතුර ලබාගැනීමේදී දෝෂයක් සිදුවුණා.';
-            chatBox.appendChild(errorDiv);
+            errorDiv.innerText = 'කණගාටුයි, පිළිතුර ලබාගැනීමේදී දෝෂයක් සිදුවුණා. කරුණාකර නැවත උත්සාහ කරන්න.';
+            chatBox.insertBefore(errorDiv, typingIndicator);
         } finally {
-            // අවසාන වශයෙන් සියල්ල සාමාන්‍ය තත්ත්වයට පත් කිරීම
             typingIndicator.style.display = 'none';
             inputElement.disabled = false;
             sendBtn.disabled = false;
@@ -224,4 +218,3 @@
 
 </body>
 </html>
-
