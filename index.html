@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temperature Control Simulator</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <div class="header">
+      <h1>🌡 Temperature Control</h1>
+      <p class="subtitle">Arduino Simulator · 230V AC</p>
+    </div>
+
+    <div class="main-grid">
+
+      <div class="left-col">
+        <div class="tempBox">
+          <div id="tempValue">25.0°C</div>
+          <input type="range" id="tempSlider" min="0" max="100" value="25" step="0.5">
+          <div class="rangeText">
+            <span>0°</span>
+            <span>100°</span>
+          </div>
+        </div>
+
+        <div class="statusBox">
+          <div class="statusTitle">Status</div>
+          <div id="status">NORMAL</div>
+        </div>
+
+        <div class="indicatorBox">
+          <div class="led-wrap">
+            <div class="led green" id="greenLed"></div>
+            <span>Green</span>
+          </div>
+          <div class="led-wrap">
+            <div class="led yellow" id="yellowLed"></div>
+            <span>Yellow</span>
+          </div>
+          <div class="led-wrap">
+            <div class="led red" id="redLed"></div>
+            <span>Red</span>
+          </div>
+        </div>
+
+        <div class="outputsBox">
+          <div class="out-item">
+            <span class="out-label">Relay</span>
+            <span id="relayState" class="out-value on">ON</span>
+          </div>
+          <div class="out-item">
+            <span class="out-label">Buzzer</span>
+            <span id="buzzerState" class="out-value off">OFF</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="circuitBox">
+          <div class="circuitTitle">⚡ 230V AC Circuit</div>
+          <div class="circuit" id="relayCircuit">
+            <div class="ckt-col">
+              <div class="ckt-badge live">L</div>
+              <div class="ckt-label">230V</div>
+            </div>
+            <div class="ckt-wire-v"></div>
+            <div class="relay-module">
+              <div class="relay-coil">
+                <span class="coil-text">COIL</span>
+                <span class="coil-pins">5V</span>
+              </div>
+              <div class="relay-switch">
+                <div class="switch-term">COM</div>
+                <div class="switch-arm-wrap">
+                  <div class="switch-arm" id="switchArm"></div>
+                </div>
+                <div class="switch-term">NO</div>
+              </div>
+              <div class="relay-tag">RELAY</div>
+            </div>
+            <div class="ckt-wire-v"></div>
+            <div class="load-block">
+              <div class="load-icon" id="loadIcon">❄</div>
+              <div class="load-name">Cooler</div>
+              <div class="load-status" id="loadStatus">OFF</div>
+            </div>
+            <div class="ckt-wire-v"></div>
+            <div class="ckt-col">
+              <div class="ckt-badge neutral">N</div>
+              <div class="ckt-label">Neutral</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="logBox">
+          <div class="logTitle">System Log</div>
+          <textarea id="serialLog" readonly></textarea>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
